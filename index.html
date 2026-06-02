@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>印人传 · 历史人物知识图谱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink-black: #1a1a1a;
+      --cinnabar: #C1392D;
+      --cinnabar-dark: #8B2500;
+      --cinnabar-light: rgba(193, 57, 45, 0.08);
+      --paper-white: #F8F4ED;
+      --jade-white: #FEFEFE;
+      --warm-gray: #F5F0E8;
+      --stone-green: #4A7A6B;
+      --ochre: #C67B30;
+      --dai-gray: #4A5568;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border-light: rgba(26, 26, 26, 0.1);
+      --border-accent: rgba(193, 57, 45, 0.3);
+      --shadow-card: 0 2px 8px rgba(26, 26, 26, 0.06);
+      --shadow-card-hover: 0 4px 16px rgba(26, 26, 26, 0.12);
+      --gold: #D4AF37;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "宋体", serif;
+      background-color: var(--paper-white);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      color: var(--text-primary);
+      line-height: 1.9;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: rgba(193, 57, 45, 0.15);
+      color: var(--cinnabar-dark);
+    }
+
+    /* ===================== 导航栏 ===================== */
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(248, 244, 237, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logo-seal {
+      width: 40px;
+      height: 40px;
+      border: 2.5px solid var(--cinnabar);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: var(--jade-white);
+    }
+
+    .logo-seal::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(193, 57, 45, 0.2);
+    }
+
+    .logo-text {
+      font-family: "STKaiti", "KaiTi", "楷体", serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--cinnabar);
+      letter-spacing: 0.15em;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.08);
+    }
+
+    .logo-sub {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      font-weight: 300;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 6px 16px;
+      border-radius: 4px;
+      transition: all 0.25s ease;
+      position: relative;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links li a::after {
+      content: "";
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      right: 50%;
+      height: 1.5px;
+      background: var(--cinnabar);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .nav-links li a:hover {
+      color: var(--cinnabar);
+    }
+
+    .nav-links li a:hover::after {
+      left: 16px;
+      right: 16px;
+    }
+
+    .nav-links li a.active {
+      color: var(--cinnabar);
+      font-weight: 500;
+    }
+
+    .nav-links li a.active::after {
+      left: 16px;
+      right: 16px;
+    }
+
+    .nav-search-btn {
+      background: none;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    .nav-search-btn:hover {
+      border-color: var(--cinnabar);
+      color: var(--cinnabar);
+    }
+
+    /* ===================== Hero 区域 ===================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-pattern {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .hero-bg-pattern .seal-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      opacity: 0.04;
+    }
+
+    .hero-bg-pattern .grid-seal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "STKaiti", serif;
+      font-size: 14px;
+      color: var(--cinnabar);
+      border: 1px solid rgba(193, 57, 45, 0.15);
+      margin: 4px;
+      aspect-ratio: 1;
+      max-width: 60px;
+    }
+
+    .hero-decoration-top {
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cinnabar), transparent);
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeSlideDown 0.8s ease forwards 0.2s;
+    }
+
+    .hero-eyebrow {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--ochre);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeSlideDown 0.8s ease forwards 0.4s;
+    }
+
+    .hero-title {
+      font-family: "STKaiti", "KaiTi", "楷体", serif;
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 500;
+      color: var(--ink-black);
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeSlideDown 0.8s ease forwards 0.6s;
+    }
+
+    .hero-title-seal {
+      color: var(--cinnabar);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-subtitle {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.8;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeSlideDown 0.8s ease forwards 0.8s;
+    }
+
+    /* 搜索框 */
+    .search-wrapper {
+      width: 100%;
+      max-width: 680px;
+      opacity: 0;
+      animation: fadeSlideDown 0.8s ease forwards 1s;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--jade-white);
+      border: 1.5px solid var(--border-light);
+      border-radius: 8px;
+      padding: 4px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-card);
+    }
+
+    .search-box:focus-within {
+      border-color: var(--cinnabar);
+      box-shadow: 0 0 0 4px rgba(193, 57, 45, 0.08), var(--shadow-card-hover);
+    }
+
+    .search-icon {
+      padding: 0 16px 0 20px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: "Noto Serif SC", serif;
+      font-size: 16px;
+      color: var(--text-primary);
+      background: transparent;
+      padding: 14px 0;
+      line-height: 1.6;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .search-btn {
+      background: var(--cinnabar);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 28px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      margin: 3px;
+    }
+
+    .search-btn:hover {
+      background: var(--cinnabar-dark);
+      transform: translateY(-1px);
+    }
+
+    .search-btn:active {
+      transform: translateY(0);
+    }
+
+    /* 快捷标签 */
+    .quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+      opacity: 0;
+      animation: fadeSlideDown 0.8s ease forwards 1.2s;
+    }
+
+    .quick-tag {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 5px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-tag:hover {
+      color: var(--cinnabar);
+      border-color: rgba(193, 57, 45, 0.3);
+      background: rgba(193, 57, 45, 0.05);
+    }
+
+    /* 滚动提示 */
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 1.8s;
+    }
+
+    .scroll-hint span {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--text-muted), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.2); }
+    }
+
+    /* ===================== 统计数据区 ===================== */
+    .stats-section {
+      padding: 48px 24px;
+      background: var(--jade-white);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .stats-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .stat-item:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 40px;
+      width: 1px;
+      background: var(--border-light);
+    }
+
+    .stat-number {
+      font-family: "Noto Serif SC", serif;
+      font-size: 40px;
+      font-weight: 600;
+      color: var(--cinnabar);
+      line-height: 1;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.15em;
+    }
+
+    /* ===================== 功能模块区 ===================== */
+    .features-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-tag {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--ochre);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      font-weight: 300;
+    }
+
+    .section-title {
+      font-family: "STKaiti", "KaiTi", "楷体", serif;
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--ink-black);
+      margin-bottom: 16px;
+    }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 50px;
+      height: 2px;
+      background: var(--cinnabar);
+      margin: 14px auto 0;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--jade-white);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 36px 32px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cinnabar), var(--ochre));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-3px);
+      border-color: rgba(193, 57, 45, 0.2);
+    }
+
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .feature-icon.seal { background: rgba(193, 57, 45, 0.08); color: var(--cinnabar); }
+    .feature-icon.graph { background: rgba(74, 122, 107, 0.1); color: var(--stone-green); }
+    .feature-icon.传承 { background: rgba(198, 123, 48, 0.1); color: var(--ochre); }
+    .feature-icon.qa { background: rgba(74, 85, 104, 0.08); color: var(--dai-gray); }
+
+    .feature-title {
+      font-family: "STKaiti", "KaiTi", "楷体", serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--ink-black);
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .feature-arrow {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--cinnabar);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: gap 0.2s;
+    }
+
+    .feature-card:hover .feature-arrow {
+      gap: 12px;
+    }
+
+    /* ===================== 近期人物区 ===================== */
+    .persons-section {
+      background: var(--jade-white);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      padding: 80px 0;
+    }
+
+    .persons-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .persons-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .persons-header-left .section-tag { text-align: left; }
+    .persons-header-left .section-title { text-align: left; }
+    .persons-header-left .section-title::after { margin: 14px 0 0; }
+
+    .view-all-link {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--cinnabar);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .view-all-link:hover {
+      border-bottom-color: var(--cinnabar);
+      gap: 10px;
+    }
+
+    .persons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .person-card {
+      background: var(--paper-white);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .person-card:hover {
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+    }
+
+    .person-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .person-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(193, 57, 45, 0.1), rgba(198, 123, 48, 0.1));
+      border: 2px solid rgba(193, 57, 45, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "STKaiti", serif;
+      font-size: 22px;
+      color: var(--cinnabar);
+      flex-shrink: 0;
+    }
+
+    .person-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .person-name {
+      font-family: "STKaiti", "KaiTi", "楷体", serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--ink-black);
+      margin-bottom: 4px;
+    }
+
+    .person-meta {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .person-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .person-excerpt {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .person-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-family: "Noto Sans SC", sans-serif;
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      border: 1px solid rgba(193, 57, 45, 0.15);
+    }
+
+    .tag.green {
+      background: rgba(74, 122, 107, 0.08);
+      color: var(--stone-green);
+      border-color: rgba(74, 122, 107, 0.15);
+    }
+
+    .tag.ochre {
+      background: rgba(198, 123, 48, 0.08);
+      color: var(--ochre);
+      border-color: rgba(198, 123, 48, 0.15);
+    }
+
+    /* ===================== 底部 ===================== */
+    .footer {
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-light), var(--cinnabar), var(--border-light), transparent);
+      margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer-content {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+
+    .footer-content a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-content a:hover {
+      color: var(--cinnabar);
+    }
+
+    .footer-copy {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    /* ===================== 动画 ===================== */
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===================== 响应式 ===================== */
+    @media (max-width: 900px) {
+      .nav-bar { padding: 0 24px; }
+      .nav-links { display: none; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .stat-item:nth-child(2)::after { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .persons-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 90px 20px 40px; }
+      .hero-title { font-size: 32px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .stat-number { font-size: 30px; }
+      .persons-grid { grid-template-columns: 1fr; }
+      .persons-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .search-btn { padding: 10px 18px; }
+      .search-input { font-size: 15px; }
+      .footer-content { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航栏 -->
+  <nav class="nav-bar">
+    <a class="nav-logo">
+      <div class="logo-seal">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <text x="2" y="16" font-family="STKaiti, KaiTi, serif" font-size="13" fill="#C1392D" font-weight="600">印</text>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">印人传</div>
+        <div class="logo-sub">知识图谱</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" class="active">首页</a></li>
+      <li><a href="#">人物</a></li>
+      <li><a href="#">鉴赏</a></li>
+      <li><a href="#">流派</a></li>
+      <li><a href="#">问答</a></li>
+      <li><a href="#">关于</a></li>
+    </ul>
+    <button class="nav-search-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      搜索
+    </button>
+  </nav>
+
+  <!-- Hero 区域 -->
+  <section class="hero">
+    <div class="hero-bg-pattern">
+      <div class="seal-grid" id="sealGrid"></div>
+    </div>
+
+    <div class="hero-decoration-top"></div>
+    <div class="hero-eyebrow">篆刻艺术 · 知识图谱</div>
+
+    <h1 class="hero-title">
+      <span class="hero-title-seal">《印人传》</span>历史人物知识图谱
+    </h1>
+
+    <p class="hero-subtitle">
+      探索明清篆刻大师的生平、师承、交游与艺术成就<br>
+      以知识图谱重现中国篆刻艺术的璀璨脉络
+    </p>
+
+    <div class="search-wrapper">
+      <div class="search-box">
+        <div class="search-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </div>
+        <input class="search-input" type="text" placeholder="询问《印人传》中的人物，如：文彭是谁？何震有哪些弟子？">
+        <button class="search-btn">检索</button>
+      </div>
+    </div>
+
+    <div class="quick-tags">
+      <span class="quick-tag">文彭</span>
+      <span class="quick-tag">何震</span>
+      <span class="quick-tag">丁敬</span>
+      <span class="quick-tag">邓石如</span>
+      <span class="quick-tag">浙派</span>
+      <span class="quick-tag">皖派</span>
+      <span class="quick-tag">吴门印派</span>
+      <span class="quick-tag">师承关系</span>
+    </div>
+
+    <div class="scroll-hint">
+      <span>向下探索</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- 统计数据 -->
+  <section class="stats-section">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="128">0</div>
+        <div class="stat-label">历史人物</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="356">0</div>
+        <div class="stat-label">关系连线</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="8">0</div>
+        <div class="stat-label">篆刻流派</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="2400">0</div>
+        <div class="stat-label">原文段落</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 功能模块 -->
+  <section class="features-section">
+    <div class="section-header reveal">
+      <div class="section-tag">Explore</div>
+      <h2 class="section-title">探索模块</h2>
+      <p class="section-desc">从人物传记到师承脉络，从图谱可视化为智能问答，多维度深入了解印人世界</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon seal">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">人物图谱</h3>
+        <p class="feature-desc">以知识图谱可视化印人之间的人物关系，支持节点筛选、缩放拖拽、详情查看</p>
+        <div class="feature-arrow">
+          进入图谱
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon graph">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">流派传承</h3>
+        <p class="feature-desc">按朝代与流派组织人物分类，追溯从明代吴门到清代皖派、浙派的艺术传承</p>
+        <div class="feature-arrow">
+          浏览流派
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon 传承">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h4l3-9 4 18 3-9h4"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">师承脉络</h3>
+        <p class="feature-desc">追溯印人之间的师徒关系，以时间轴与脉络图呈现篆刻技艺的代际传递</p>
+        <div class="feature-arrow">
+          查看脉络
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon qa">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">知识问答</h3>
+        <p class="feature-desc">以自然语言提问，快速获取印人信息、关系推理与原文引用，无需编写查询语句</p>
+        <div class="feature-arrow">
+          开始问答
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 近期人物 -->
+  <section class="persons-section">
+    <div class="persons-inner">
+      <div class="persons-header persons-header-left reveal">
+        <div>
+          <div class="section-tag">Notable Figures</div>
+          <h2 class="section-title">代表印人</h2>
+        </div>
+        <a href="#" class="view-all-link">
+          查看全部人物
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="persons-grid">
+        <div class="person-card reveal">
+          <div class="person-card-top">
+            <div class="person-avatar">文</div>
+            <div class="person-info">
+              <div class="person-name">文彭</div>
+              <div class="person-meta">
+                <span class="person-meta-item">明代</span>
+                <span class="person-meta-item">·</span>
+                <span class="person-meta-item">吴门印派</span>
+              </div>
+            </div>
+          </div>
+          <p class="person-excerpt">文徵明长子，首创元朱文，以石刻印取代象牙犀角，开文人篆刻之先河，被尊为吴门印派之祖。</p>
+          <div class="person-tags">
+            <span class="tag">吴门印派</span>
+            <span class="tag green">明代</span>
+          </div>
+        </div>
+
+        <div class="person-card reveal">
+          <div class="person-card-top">
+            <div class="person-avatar">何</div>
+            <div class="person-info">
+              <div class="person-name">何震</div>
+              <div class="person-meta">
+                <span class="person-meta-item">明代</span>
+                <span class="person-meta-item">·</span>
+                <span class="person-meta-item">皖派代表</span>
+              </div>
+            </div>
+          </div>
+          <p class="person-excerpt">师从文彭，篆刻风格多样，白文刚健精纯，朱文温雅流畅，与文彭并称"文何"，为皖派开山之祖。</p>
+          <div class="person-tags">
+            <span class="tag">皖派</span>
+            <span class="tag ochre">文彭弟子</span>
+          </div>
+        </div>
+
+        <div class="person-card reveal">
+          <div class="person-card-top">
+            <div class="person-avatar">丁</div>
+            <div class="person-info">
+              <div class="person-name">丁敬</div>
+              <div class="person-meta">
+                <span class="person-meta-item">清代</span>
+                <span class="person-meta-item">·</span>
+                <span class="person-meta-item">浙派创始人</span>
+              </div>
+            </div>
+          </div>
+          <p class="person-excerpt">钱塘人，兼收众长，不主一派，以切刀法刻印，苍劲质朴，一扫纤巧媚俗之习，开创清代篆刻新风。</p>
+          <div class="person-tags">
+            <span class="tag green">浙派</span>
+            <span class="tag">清代</span>
+          </div>
+        </div>
+
+        <div class="person-card reveal">
+          <div class="person-card-top">
+            <div class="person-avatar">邓</div>
+            <div class="person-info">
+              <div class="person-name">邓石如</div>
+              <div class="person-meta">
+                <span class="person-meta-item">清代</span>
+                <span class="person-meta-item">·</span>
+                <span class="person-meta-item">皖派中兴</span>
+              </div>
+            </div>
+          </div>
+          <p class="person-excerpt">以隶法入篆、以篆意入刻，以刚健婀娜之风雄视印坛，与徽籍金石家共同推动皖派中兴。</p>
+          <div class="person-tags">
+            <span class="tag">皖派</span>
+            <span class="tag green">清代</span>
+          </div>
+        </div>
+
+        <div class="person-card reveal">
+          <div class="person-card-top">
+            <div class="person-avatar">程</div>
+            <div class="person-info">
+              <div class="person-name">程邃</div>
+              <div class="person-meta">
+                <span class="person-meta-item">明末清初</span>
+                <span class="person-meta-item">·</span>
+                <span class="person-meta-item">徽派先驱</span>
+              </div>
+            </div>
+          </div>
+          <p class="person-excerpt">长于金石考证，以缪篆及金文入印，印章风格凝重古朴，苍劲洗练，为徽派篆刻之先导。</p>
+          <div class="person-tags">
+            <span class="tag">徽派</span>
+            <span class="tag ochre">明末清初</span>
+          </div>
+        </div>
+
+        <div class="person-card reveal">
+          <div class="person-card-top">
+            <div class="person-avatar">赵</div>
+            <div class="person-info">
+              <div class="person-name">赵之谦</div>
+              <div class="person-meta">
+                <span class="person-meta-item">清代</span>
+                <span class="person-meta-item">·</span>
+                <span class="person-meta-item">清代晚期</span>
+              </div>
+            </div>
+          </div>
+          <p class="person-excerpt">晚清著名艺术大家，书画篆刻皆精，印章融合浙皖二派之精华，并引入秦权诏版等吉金文字，自成一家。</p>
+          <div class="person-tags">
+            <span class="tag green">清代</span>
+            <span class="tag">融汇诸家</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-divider"></div>
+    <div class="footer-content">
+      <a href="#">关于我们</a>
+      <span>·</span>
+      <a href="#">数据来源</a>
+      <span>·</span>
+      <a href="#">项目成员</a>
+      <span>·</span>
+      <a href="#">GitHub</a>
+    </div>
+    <p class="footer-copy">© 2026 印人传 · 基于《印人传》原文构建的知识图谱</p>
+  </footer>
+
+  <script>
+    // 生成印章背景网格
+    (function() {
+      const grid = document.getElementById('sealGrid');
+      const chars = ['印', '人', '传', '印', '人', '传', '印', '人', '传', '印', '人', '传'];
+      for (let i = 0; i < 40; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-seal';
+        cell.textContent = chars[i % chars.length];
+        grid.appendChild(cell);
+      }
+    })();
+
+    // 数字滚动动画
+    function animateCount(el) {
+      const target = parseInt(el.dataset.target);
+      const duration = 1800;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target);
+        if (progress < 1) requestAnimationFrame(update);
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    // Intersection Observer for reveal animations
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+
+            // 数字动画
+            const num = entry.target.querySelector('.stat-number');
+            if (num && !num.dataset.animated) {
+              num.dataset.animated = 'true';
+              animateCount(num);
+            }
+          }, index * 80);
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // 搜索功能（演示用）
+    const searchInput = document.querySelector('.search-input');
+    const searchBtn = document.querySelector('.search-btn');
+
+    searchBtn.addEventListener('click', () => {
+      const q = searchInput.value.trim();
+      if (q) alert('搜索: ' + q);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchBtn.click();
+    });
+
+    // 快捷标签
+    document.querySelectorAll('.quick-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        searchInput.value = tag.textContent;
+        searchInput.focus();
+        searchBtn.click();
+      });
+    });
+  </script>
+</body>
+</html>
