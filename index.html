@@ -132,14 +132,15 @@
       transition: all 0.25s ease;
       position: relative;
       letter-spacing: 0.05em;
+      line-height: 1;
     }
 
     .nav-links li a::after {
       content: "";
       position: absolute;
-      bottom: 2px;
+      bottom: 0;
       left: 50%;
-      right: 50%;
+      width: 0;
       height: 1.5px;
       background: var(--cinnabar);
       transition: all 0.3s ease;
@@ -150,19 +151,14 @@
       color: var(--cinnabar);
     }
 
-    .nav-links li a:hover::after {
-      left: 16px;
-      right: 16px;
+    .nav-links li a:hover::after,
+    .nav-links li a.active::after {
+      width: calc(100% - 32px);
     }
 
     .nav-links li a.active {
       color: var(--cinnabar);
       font-weight: 500;
-    }
-
-    .nav-links li a.active::after {
-      left: 16px;
-      right: 16px;
     }
 
     .nav-search-btn {
@@ -626,14 +622,17 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
       transition: all 0.2s;
     }
 
     .view-all-link:hover {
-      border-bottom-color: var(--cinnabar);
       gap: 10px;
+      text-decoration-color: var(--cinnabar);
     }
 
     .persons-grid {
@@ -775,10 +774,14 @@
       color: var(--text-muted);
       text-decoration: none;
       transition: color 0.2s;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
     }
 
     .footer-content a:hover {
       color: var(--cinnabar);
+      text-decoration: underline;
+      text-decoration-color: var(--cinnabar);
     }
 
     .footer-copy {
@@ -1213,13 +1216,17 @@
     const searchInput = document.querySelector('.search-input');
     const searchBtn = document.querySelector('.search-btn');
 
-    searchBtn.addEventListener('click', () => {
+    function doSearch() {
       const q = searchInput.value.trim();
-      if (q) alert('搜索: ' + q);
-    });
+      if (!q) return;
+      const persons = document.querySelector('.persons-section');
+      if (persons) persons.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    searchBtn.addEventListener('click', doSearch);
 
     searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') searchBtn.click();
+      if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
     });
 
     // 快捷标签
@@ -1227,7 +1234,7 @@
       tag.addEventListener('click', () => {
         searchInput.value = tag.textContent;
         searchInput.focus();
-        searchBtn.click();
+        searchInput.dispatchEvent(new Event('input'));
       });
     });
   </script>
