@@ -140,17 +140,14 @@ SELECT ?person ?name WHERE {{
             s_str, o_str = str(s), str(o)
             p_str = str(p)
 
-            # Skip all RDF/RDFS/OWL namespaced predicates
             if "#" in p_str:
                 continue
 
             rel = p_str.split("/")[-1]
 
-            # Skip evidence/metadata predicates
             if rel in ("extractedBy", "source", "extractionMethod"):
                 continue
 
-            # Only include INK namespace subject URIs
             ink_ns = str(INK_NS)
             if ink_ns not in s_str:
                 continue
@@ -161,3 +158,46 @@ SELECT ?person ?name WHERE {{
                 G.add_edge(s_name, o_name, relation=rel)
 
         return G
+
+    def as_networkx_full(self):
+        """Return NetworkX graph with school/person node_type attribute."""
+        import networkx as nx
+        G = nx.DiGraph()
+
+        for s, p, o in self.graph:
+            s_str, o_str = str(s), str(o)
+            p_str = str(p)
+
+            if "#" in p_str:
+                continue
+
+            rel = p_str.split("/")[-1]
+
+            if rel in ("extractedBy", "source", "extractionMethod"):
+                continue
+
+            ink_ns = str(INK_NS)
+            if ink_ns not in s_str:
+                continue
+
+            s_type = self._uri_to_node_type(s_str)
+            o_type = self._uri_to_node_type(o_str)
+            s_name = self._uri_to_name(s_str)
+            o_name = self._uri_to_name(o_str)
+
+            if s_name and o_name and s_name != o_name:
+                G.add_edge(s_name, o_name, relation=rel)
+                G.nodes[s_name]["node_type"] = s_type
+                G.nodes[o_name]["node_type"] = o_type
+
+        return G
+
+    def _uri_to_node_type(self, uri_str: str) -> str:
+        """Return 'school' or 'person' based on URI path segment."""
+        if "school/" in uri_str:
+            return "school"
+        if "person/" in uri_str:
+            return "person"
+        if "place/" in uri_str:
+            return "place"
+        return "unknown"

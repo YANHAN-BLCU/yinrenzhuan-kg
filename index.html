@@ -834,7 +834,531 @@
       .search-input { font-size: 15px; }
       .footer-content { flex-direction: column; gap: 12px; }
     }
+
+    /* ===================== 图谱区域 ===================== */
+    .graph-section {
+      padding: 80px 24px;
+      background: var(--jade-white);
+      min-height: 700px;
+    }
+
+    .graph-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .graph-filters {
+      display: flex;
+      gap: 8px;
+    }
+
+    .graph-filter {
+      padding: 6px 16px;
+      border: 1px solid var(--border-light);
+      background: transparent;
+      border-radius: 20px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .graph-filter:hover, .graph-filter.active {
+      background: var(--cinnabar);
+      color: white;
+      border-color: var(--cinnabar);
+    }
+
+    .graph-legend {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.person { background: var(--cinnabar); }
+    .legend-dot.school { background: var(--stone-green); }
+
+    .legend-line {
+      width: 18px;
+      height: 2px;
+      border-radius: 1px;
+    }
+
+    .graph-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--jade-white);
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      position: relative;
+      height: 560px;
+      overflow: hidden;
+    }
+
+    #graphSvg {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    #graphSvg:active { cursor: grabbing; }
+
+    .graph-loading, .graph-error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--text-muted);
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border-light);
+      border-top-color: var(--cinnabar);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .graph-error button {
+      padding: 6px 16px;
+      background: var(--cinnabar);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+    }
+
+    .graph-controls {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .graph-btn {
+      width: 36px;
+      height: 36px;
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      box-shadow: var(--shadow-card);
+    }
+
+    .graph-btn:hover {
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      border-color: var(--cinnabar);
+    }
+
+    .graph-info {
+      max-width: 1100px;
+      margin: 16px auto 0;
+      text-align: center;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .graph-info-sep { margin: 0 8px; }
+
+    /* D3 图谱节点和连线样式 */
+    .node circle {
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+
+    .node circle:hover { filter: brightness(1.15); }
+
+    .node text {
+      font-family: "Noto Serif SC", serif;
+      font-size: 12px;
+      pointer-events: none;
+      fill: var(--text-primary);
+      paint-order: stroke;
+      stroke: var(--paper-white);
+      stroke-width: 3px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .link {
+      stroke-opacity: 0.6;
+    }
+
+    /* ===================== 问答区域 ===================== */
+    .qa-section {
+      padding: 80px 24px;
+      background: var(--paper-white);
+    }
+
+    .qa-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .qa-box {
+      background: var(--jade-white);
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .qa-input-area {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .qa-input {
+      flex: 1;
+      padding: 14px 16px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-family: "Noto Serif SC", serif;
+      font-size: 15px;
+      color: var(--text-primary);
+      background: white;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+
+    .qa-input:focus { border-color: var(--cinnabar); }
+
+    .qa-submit {
+      padding: 14px 24px;
+      background: var(--cinnabar);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .qa-submit:hover { background: var(--cinnabar-dark); }
+
+    .qa-submit:disabled {
+      background: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .qa-hint {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .qa-example {
+      padding: 3px 10px;
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .qa-example:hover { background: var(--cinnabar); color: white; }
+
+    .qa-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .qa-result {
+      background: var(--jade-white);
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+    }
+
+    .qa-result-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .qa-result-label {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .qa-result-meta {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 16px;
+    }
+
+    .qa-result-body {
+      padding: 20px 24px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-primary);
+    }
+
+    .qa-result-body .rel-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 2px 4px;
+    }
+
+    .qa-result-body .rel-badge {
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    /* ===================== 人物详情模态框 ===================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-backdrop {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(26, 26, 26, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      position: relative;
+      background: var(--jade-white);
+      border-radius: 16px;
+      max-width: 540px;
+      width: 90%;
+      max-height: 85vh;
+      margin: auto;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(26, 26, 26, 0.2);
+      animation: modalIn 0.25s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      background: var(--border-light);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      z-index: 1;
+    }
+
+    .modal-close:hover { background: var(--cinnabar); color: white; }
+
+    .modal-header {
+      padding: 28px 28px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .modal-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--cinnabar);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .modal-title-area { flex: 1; }
+
+    .modal-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .modal-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .modal-tag {
+      padding: 3px 10px;
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      border-radius: 12px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+    }
+
+    .modal-tag.school {
+      background: rgba(74, 122, 107, 0.1);
+      color: var(--stone-green);
+    }
+
+    .modal-body { padding: 20px 28px 28px; }
+
+    .modal-meta {
+      margin-bottom: 20px;
+    }
+
+    .meta-item {
+      display: flex;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .meta-label {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .meta-value {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .modal-relations h4 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    .rel-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .rel-entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--paper-white);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .rel-entry:hover { background: var(--cinnabar-light); }
+
+    .rel-type {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 11px;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--cinnabar);
+      flex-shrink: 0;
+    }
+
+    .rel-type.teacherOf { background: var(--cinnabar); }
+    .rel-type.studentOf { background: var(--stone-green); }
+    .rel-type.belongsToSchool { background: var(--ochre); }
+    .rel-type.foundedSchool { background: var(--ochre); }
+
+    .rel-name { font-size: 14px; color: var(--text-primary); }
   </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
 
@@ -1012,8 +1536,61 @@
     </div>
   </section>
 
+  <!-- 知识图谱 -->
+  <section class="graph-section" id="graphSection">
+    <div class="section-header reveal">
+      <div class="section-tag">Knowledge Graph</div>
+      <h2 class="section-title">人物关系图谱</h2>
+      <p class="section-desc">可视化印人之间的人物关系，点击节点查看详情，探索师承与交游网络</p>
+    </div>
+
+    <div class="graph-toolbar">
+      <div class="graph-filters">
+        <button class="graph-filter active" data-filter="all">全部</button>
+        <button class="graph-filter" data-filter="person">人物</button>
+        <button class="graph-filter" data-filter="school">学派</button>
+      </div>
+      <div class="graph-legend">
+        <span class="legend-item"><span class="legend-dot person"></span>人物</span>
+        <span class="legend-item"><span class="legend-dot school"></span>学派</span>
+        <span class="legend-item"><span class="legend-line" style="background:#C1392D"></span>师生</span>
+        <span class="legend-item"><span class="legend-line" style="background:#4A7A6B"></span>归属</span>
+        <span class="legend-item"><span class="legend-line" style="background:#C67B30"></span>其他</span>
+      </div>
+    </div>
+
+    <div class="graph-container">
+      <div class="graph-loading" id="graphLoading">
+        <div class="loading-spinner"></div>
+        <span>加载图谱数据中...</span>
+      </div>
+      <div class="graph-error" id="graphError" style="display:none">
+        <p>无法加载图谱数据，请确保后端服务已启动</p>
+        <button onclick="loadGraph()">重试</button>
+      </div>
+      <svg id="graphSvg"></svg>
+      <div class="graph-controls">
+        <button class="graph-btn" onclick="zoomIn()" title="放大">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="graph-btn" onclick="zoomOut()" title="缩小">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="graph-btn" onclick="resetZoom()" title="重置">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="graph-info" id="graphInfo">
+      <span id="graphNodeCount">0 个节点</span>
+      <span class="graph-info-sep">·</span>
+      <span id="graphEdgeCount">0 条关系</span>
+    </div>
+  </section>
+
   <!-- 近期人物 -->
-  <section class="persons-section">
+  <section class="persons-section" id="personsSection">
     <div class="persons-inner">
       <div class="persons-header persons-header-left reveal">
         <div>
@@ -1146,6 +1723,64 @@
     </div>
   </section>
 
+  <!-- 人物详情模态框 -->
+  <div class="modal-overlay" id="personModal">
+    <div class="modal-backdrop" onclick="closePersonModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closePersonModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="modal-header">
+        <div class="modal-avatar" id="modalAvatar"></div>
+        <div class="modal-title-area">
+          <h2 class="modal-name" id="modalName"></h2>
+          <div class="modal-tags" id="modalTags"></div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta" id="modalMeta"></div>
+        <div class="modal-relations" id="modalRelations"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 知识问答 -->
+  <section class="qa-section" id="qaSection">
+    <div class="section-header reveal">
+      <div class="section-tag">Q&amp;A</div>
+      <h2 class="section-title">知识问答</h2>
+      <p class="section-desc">以自然语言提问，快速获取印人信息、关系推理与原文引用</p>
+    </div>
+    <div class="qa-container">
+      <div class="qa-box">
+        <div class="qa-input-area">
+          <textarea class="qa-input" id="qaInput" placeholder="询问《印人传》中的人物，如：文彭是谁？何震有哪些弟子？浙派有哪些代表人物？" rows="3"></textarea>
+          <button class="qa-submit" id="qaSubmit" onclick="submitQuestion()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            提问
+          </button>
+        </div>
+        <div class="qa-hint">
+          <span>试试：</span>
+          <button class="qa-example" onclick="askQuestion('文彭是谁？')">文彭是谁？</button>
+          <button class="qa-example" onclick="askQuestion('何震有哪些弟子？')">何震有哪些弟子？</button>
+          <button class="qa-example" onclick="askQuestion('吴门印派有哪些人？')">吴门印派有哪些人？</button>
+        </div>
+      </div>
+      <div class="qa-result" id="qaResult" style="display:none">
+        <div class="qa-result-header">
+          <div class="qa-result-label">回答</div>
+          <div class="qa-result-meta" id="qaResultMeta"></div>
+        </div>
+        <div class="qa-result-body" id="qaResultBody"></div>
+      </div>
+      <div class="qa-loading" id="qaLoading" style="display:none">
+        <div class="loading-spinner"></div>
+        <span>正在分析问题...</span>
+      </div>
+    </div>
+  </section>
+
   <!-- 页脚 -->
   <footer class="footer">
     <div class="footer-divider"></div>
@@ -1236,6 +1871,451 @@
         searchInput.focus();
         searchInput.dispatchEvent(new Event('input'));
       });
+    });
+
+    // ==================== 知识图谱 ====================
+    const API_BASE = 'http://127.0.0.1:8000';
+    let graphData = { nodes: [], links: [] };
+    let simulation, svg, g, zoom;
+    let currentFilter = 'all';
+
+    async function loadGraph() {
+      const loading = document.getElementById('graphLoading');
+      const error = document.getElementById('graphError');
+      loading.style.display = 'flex';
+      error.style.display = 'none';
+
+      try {
+        const [graphRes, personsRes] = await Promise.all([
+          fetch(`${API_BASE}/api/graph`),
+          fetch(`${API_BASE}/api/persons`)
+        ]);
+
+        if (!graphRes.ok || !personsRes.ok) throw new Error('API unavailable');
+
+        const graphJson = await graphRes.json();
+        const personsJson = await personsRes.json();
+
+        if (!graphJson.nodes || graphJson.nodes.length === 0) {
+          error.style.display = 'flex';
+          error.querySelector('p').textContent = '暂无图谱数据，请先运行 src/run_pipeline.py 构建知识图谱';
+          loading.style.display = 'none';
+          return;
+        }
+
+        graphData = graphJson;
+        renderGraph(graphJson, personsJson.persons || []);
+        loading.style.display = 'none';
+        document.getElementById('graphNodeCount').textContent = graphJson.nodes.length + ' 个节点';
+        document.getElementById('graphEdgeCount').textContent = graphJson.links.length + ' 条关系';
+      } catch (e) {
+        console.error('Graph load error:', e);
+        error.style.display = 'flex';
+        loading.style.display = 'none';
+      }
+    }
+
+    function renderGraph(data, personsList) {
+      const container = document.querySelector('.graph-container');
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      d3.select('#graphSvg').selectAll('*').remove();
+
+      svg = d3.select('#graphSvg')
+        .attr('width', width)
+        .attr('height', height);
+
+      zoom = d3.zoom()
+        .scaleExtent([0.2, 4])
+        .on('zoom', (event) => {
+          g.attr('transform', event.transform);
+        });
+
+      svg.call(zoom);
+
+      g = svg.append('g');
+
+      const personsSet = new Set((personsList || []).map(p => p.name));
+
+      const nodes = data.nodes.map(n => ({
+        id: n.id || n.name,
+        name: n.label || n.name,
+        type: n.type || (n.id && n.id.startsWith('school/') ? 'school' : 'person'),
+        centrality: n.centrality
+      }));
+
+      const links = data.links.map(l => ({
+        source: l.source,
+        target: l.target,
+        type: l.type || 'related'
+      }));
+
+      simulation = d3.forceSimulation(nodes)
+        .force('link', d3.forceLink(links).id(d => d.id).distance(90).strength(0.5))
+        .force('charge', d3.forceManyBody().strength(-220))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide(30));
+
+      // 连线
+      const link = g.append('g')
+        .selectAll('line')
+        .data(links)
+        .join('line')
+        .attr('class', 'link')
+        .attr('stroke', d => {
+          if (d.type === 'studentOf' || d.type === 'teacherOf') return '#C1392D';
+          if (d.type === 'belongsToSchool' || d.type === 'foundedSchool') return '#4A7A6B';
+          return '#C67B30';
+        })
+        .attr('stroke-width', 1.5);
+
+      // 箭头标记
+      const defs = svg.append('defs');
+      ['#C1392D', '#4A7A6B', '#C67B30'].forEach(color => {
+        defs.append('marker')
+          .attr('id', 'arrow-' + color.replace('#', ''))
+          .attr('viewBox', '0 -5 10 10')
+          .attr('refX', 20)
+          .attr('refY', 0)
+          .attr('markerWidth', 6)
+          .attr('markerHeight', 6)
+          .attr('orient', 'auto')
+          .append('path')
+          .attr('fill', color)
+          .attr('d', 'M0,-5L10,0L0,5');
+      });
+
+      link.attr('marker-end', d => {
+        const color = d.type === 'studentOf' || d.type === 'teacherOf' ? 'C1392D'
+          : d.type === 'belongsToSchool' || d.type === 'foundedSchool' ? '4A7A6B' : 'C67B30';
+        return `url(#arrow-${color})`;
+      });
+
+      // 节点
+      const node = g.append('g')
+        .selectAll('g')
+        .data(nodes)
+        .join('g')
+        .attr('class', 'node')
+        .call(drag(simulation));
+
+      node.append('circle')
+        .attr('r', d => d.type === 'school' ? 22 : 16)
+        .attr('fill', d => d.type === 'school' ? '#4A7A6B' : '#C1392D')
+        .attr('stroke', 'white')
+        .attr('stroke-width', 2)
+        .on('click', (event, d) => {
+          event.stopPropagation();
+          if (d.type === 'person') {
+            showPersonDetail(d.name);
+          }
+        })
+        .on('mouseenter', function(event, d) {
+          d3.select(this).attr('r', d.type === 'school' ? 26 : 20);
+        })
+        .on('mouseleave', function(event, d) {
+          d3.select(this).attr('r', d.type === 'school' ? 22 : 16);
+        });
+
+      node.append('text')
+        .attr('dy', d => d.type === 'school' ? 36 : 28)
+        .attr('text-anchor', 'middle')
+        .text(d => d.name)
+        .style('font-size', d => d.type === 'school' ? '11px' : '12px');
+
+      simulation.on('tick', () => {
+        link
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y);
+        node.attr('transform', d => `translate(${d.x},${d.y})`);
+      });
+
+      applyFilter(currentFilter);
+    }
+
+    function drag(simulation) {
+      function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+      function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+      return d3.drag()
+        .on('start', dragstarted)
+        .on('drag', dragged)
+        .on('end', dragended);
+    }
+
+    function applyFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.graph-filter').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+
+      g.selectAll('.node').style('display', d => {
+        if (filter === 'all') return '';
+        if (filter === 'person') return d.type === 'person' ? '' : 'none';
+        if (filter === 'school') return d.type === 'school' ? '' : 'none';
+        return '';
+      });
+
+      const visibleNodeIds = new Set(
+        graphData.nodes
+          .filter(n => {
+            if (filter === 'all') return true;
+            if (filter === 'person') return n.type === 'person';
+            if (filter === 'school') return n.type === 'school';
+            return true;
+          })
+          .map(n => n.id)
+      );
+
+      g.selectAll('.link').style('display', d => {
+        if (filter === 'all') return '';
+        return visibleNodeIds.has(d.source.id || d.source) && visibleNodeIds.has(d.target.id || d.target) ? '' : 'none';
+      });
+    }
+
+    function zoomIn() {
+      svg.transition().duration(300).call(zoom.scaleBy, 1.3);
+    }
+
+    function zoomOut() {
+      svg.transition().duration(300).call(zoom.scaleBy, 0.7);
+    }
+
+    function resetZoom() {
+      svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity);
+    }
+
+    // 筛选按钮
+    document.querySelectorAll('.graph-filter').forEach(btn => {
+      btn.addEventListener('click', () => applyFilter(btn.dataset.filter));
+    });
+
+    // ==================== 人物详情模态框 ====================
+    async function showPersonDetail(name) {
+      const modal = document.getElementById('personModal');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      document.getElementById('modalAvatar').textContent = name.slice(0, 1);
+      document.getElementById('modalName').textContent = name;
+      document.getElementById('modalMeta').innerHTML = '<div style="color:var(--text-muted);font-size:14px">加载中...</div>';
+      document.getElementById('modalRelations').innerHTML = '';
+      document.getElementById('modalTags').innerHTML = '';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/person/${encodeURIComponent(name)}`);
+        if (!res.ok) throw new Error('Person not found');
+        const data = await res.json();
+
+        document.getElementById('modalName').textContent = data.person_name || name;
+
+        const tags = [];
+        if (data.dynasty) tags.push(`<span class="modal-tag">${data.dynasty}</span>`);
+        (data.schools || []).forEach(s => {
+          tags.push(`<span class="modal-tag school">${s}</span>`);
+        });
+        document.getElementById('modalTags').innerHTML = tags.join('');
+
+        let metaHtml = '';
+        if (data.style_name) metaHtml += metaRow('字号', data.style_name);
+        if (data.hao) metaHtml += metaRow('号', data.hao);
+        if (data.native_place) metaHtml += metaRow('籍贯', data.native_place);
+        if (data.birth_year || data.death_year) {
+          metaHtml += metaRow('生卒', `${data.birth_year || '?'} — ${data.death_year || '?'}`);
+        }
+        document.getElementById('modalMeta').innerHTML = metaHtml || '<div style="color:var(--text-muted);font-size:13px">暂无详细信息</div>';
+
+        const rels = data.relations || [];
+        if (rels.length > 0) {
+          let relHtml = '<h4>人物关系</h4><div class="rel-list">';
+          rels.forEach(r => {
+            const typeLabel = relTypeLabel(r.type);
+            relHtml += `<div class="rel-entry" onclick="navigateToPerson('${r.target}')">
+              <span class="rel-type ${r.type}">${typeLabel}</span>
+              <span class="rel-name">${r.target}</span>
+            </div>`;
+          });
+          relHtml += '</div>';
+          document.getElementById('modalRelations').innerHTML = relHtml;
+        } else {
+          document.getElementById('modalRelations').innerHTML = '';
+        }
+      } catch (e) {
+        console.error('Person detail error:', e);
+        document.getElementById('modalMeta').innerHTML = '<div style="color:var(--cinnabar);font-size:14px">无法加载人物信息</div>';
+      }
+    }
+
+    function metaRow(label, value) {
+      return `<div class="meta-item">
+        <span class="meta-label">${label}</span>
+        <span class="meta-value">${value || '—'}</span>
+      </div>`;
+    }
+
+    function relTypeLabel(type) {
+      const map = {
+        studentOf: '师从', teacherOf: '教授',
+        belongsToSchool: '所属', foundedSchool: '创始',
+        fatherOf: '父亲', sonOf: '儿子',
+        friendOf: '交往', related: '相关'
+      };
+      return map[type] || type;
+    }
+
+    function closePersonModal() {
+      document.getElementById('personModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function navigateToPerson(name) {
+      closePersonModal();
+      setTimeout(() => showPersonDetail(name), 150);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePersonModal();
+    });
+
+    // ==================== 知识问答 ====================
+    async function submitQuestion() {
+      const input = document.getElementById('qaInput');
+      const question = input.value.trim();
+      if (!question) return;
+
+      document.getElementById('qaResult').style.display = 'none';
+      document.getElementById('qaLoading').style.display = 'flex';
+      document.getElementById('qaSubmit').disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/qa`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        if (!res.ok) throw new Error('QA request failed');
+        const data = await res.json();
+
+        showQAResult(data);
+      } catch (e) {
+        console.error('QA error:', e);
+        showQAResult({
+          answer: '无法连接到后端服务，请确保 FastAPI 服务已启动（python src/main.py）',
+          fallback_used: true
+        });
+      } finally {
+        document.getElementById('qaLoading').style.display = 'none';
+        document.getElementById('qaSubmit').disabled = false;
+      }
+    }
+
+    function showQAResult(data) {
+      const resultEl = document.getElementById('qaResult');
+      const bodyEl = document.getElementById('qaResultBody');
+      const metaEl = document.getElementById('qaResultMeta');
+
+      let meta = [];
+      if (data.intent) meta.push(`意图: ${data.intent}`);
+      if (data.tool_used) meta.push('工具');
+      if (data.sparql) meta.push('SPARQL');
+      metaEl.innerHTML = meta.map(m => `<span>${m}</span>`).join('');
+
+      let html = `<p>${data.answer || '暂无答案'}</p>`;
+
+      if (data.tool_result && Object.keys(data.tool_result).length > 0) {
+        const tr = data.tool_result;
+        if (tr.relations && tr.relations.length > 0) {
+          html += '<div style="margin-top:16px">';
+          tr.relations.forEach(r => {
+            html += `<span class="rel-item">
+              <span class="rel-badge">${relTypeLabel(r.type)}</span>
+              ${r.target}
+            </span>`;
+          });
+          html += '</div>';
+        }
+      }
+
+      if (data.sparql_result && data.sparql_result.length > 0) {
+        html += `<div style="margin-top:16px;font-size:13px;color:var(--text-secondary)">
+          <strong>SPARQL 结果 (${data.sparql_result.length} 条):</strong>
+          <ul style="margin-top:6px;padding-left:20px">`;
+        data.sparql_result.slice(0, 5).forEach(r => {
+          html += `<li>${JSON.stringify(r)}</li>`;
+        });
+        html += '</ul></div>';
+      }
+
+      bodyEl.innerHTML = html;
+      resultEl.style.display = 'block';
+    }
+
+    function askQuestion(q) {
+      document.getElementById('qaInput').value = q;
+      submitQuestion();
+    }
+
+    document.getElementById('qaInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitQuestion();
+      }
+    });
+
+    // ==================== 导航高亮 ====================
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = {
+      '图谱': document.getElementById('graphSection'),
+      '人物': document.getElementById('personsSection'),
+      '问答': document.getElementById('qaSection')
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(a => {
+            const name = a.textContent.trim();
+            if (sections[name] === entry.target) {
+              document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+              a.closest('li') && a.closest('li').classList.add('active');
+            }
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    Object.values(sections).forEach(s => s && observer.observe(s));
+
+    // 特征卡片点击跳转
+    document.querySelectorAll('.feature-card').forEach((card, idx) => {
+      card.addEventListener('click', () => {
+        const targets = [sections['图谱'], sections['人物'], sections['人物'], sections['问答']];
+        const target = targets[idx];
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // ==================== 初始化 ====================
+    loadGraph();
+
+    // 页面可见时刷新图谱
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadGraph();
     });
   </script>
 </body>

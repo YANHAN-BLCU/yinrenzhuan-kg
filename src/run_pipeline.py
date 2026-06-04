@@ -144,12 +144,16 @@ def run_pipeline(
         if not subj or not obj:
             continue
 
-        # subject 必须是人名
-        if subj not in all_ner_persons:
+        # KB triples (method="known") bypass NER validation — they are verified facts
+        is_kb_triple = t.get("method") == "known"
+
+        # subject 必须是人名（NER 发现 或 KB 知识库）
+        if not is_kb_triple and subj not in all_ner_persons:
             continue
 
         if pred in PERSON_REL_PREDICATES:
-            if obj in all_ner_persons:
+            # KB triples: allow object even if not in NER (e.g., KB says "文彭→文彭", NER might not have 文彭)
+            if obj in all_ner_persons or is_kb_triple:
                 person_set.add(subj)
                 person_set.add(obj)
                 rel_triples.append(t)
@@ -225,34 +229,36 @@ def run_pipeline(
         community.save(COMMUNITIES_OUTPUT)
         logger.info(f"Community detection saved")
 
-        # Skip RDF schema class names and metadata nodes
-        RDF_SCHEMA_NODES = {
-            "Person", "School", "Place", "TimePeriod", "Style", "Evidence",
-            "Thing", "Property", "Class", "Ontology",
-        }
+        # Use full networkx with node_type info from RDF
+        G_full = rdf_store.as_networkx_full()
+        logger.info(f"Full graph: {G_full.number_of_nodes()} nodes, {G_full.number_of_edges()} edges")
 
         nodes = []
         links = []
         seen_nodes = set()
 
-        for node in G.nodes:
+        for node in G_full.nodes:
             if node in seen_nodes:
                 continue
-            if node in RDF_SCHEMA_NODES:
-                continue
-            if node.startswith("evidence/"):
-                continue
             seen_nodes.add(node)
-            school = next((d.get("relation", "") for _, _, d in G.out_edges(node, data=True)
-                          if "School" in d.get("relation", "")), None)
+
+            node_type = G_full.nodes[node].get("node_type", "person")
+            school = None
+            if node_type == "person":
+                school = next(
+                    (d.get("relation", "") for _, _, d in G_full.out_edges(node, data=True)
+                     if "School" in d.get("relation", "")), None
+                )
+            # Clean name: remove "school/" prefix for display
+            name = node.replace("school/", "") if node_type == "school" else node
             nodes.append({
                 "id": node,
-                "name": node,
-                "type": "person",
+                "name": name,
+                "type": node_type,
                 "school": school,
             })
 
-        for u, v, data in G.edges(data=True):
+        for u, v, data in G_full.edges(data=True):
             links.append({
                 "source": u, "target": v,
                 "relation": data.get("relation", "unknown"),
@@ -262,7 +268,11 @@ def run_pipeline(
         GRAPH_JSON.write_text(json.dumps(graph_data, ensure_ascii=False, indent=2), encoding="utf-8")
         logger.info(f"Graph JSON saved: {GRAPH_JSON}")
 
-        persons_data = [{"name": n} for n in sorted(p for p in person_set if p)]
+        # persons.json: only Person nodes (not schools) from RDF store
+        all_rdf_persons = rdf_store.get_all_persons()
+        # Exclude school nodes that may have leaked into person_set
+        school_names = {name.replace("school/", "") for name in schools_seen} | schools_seen
+        persons_data = [{"name": n} for n in sorted(n for n in set(all_rdf_persons) if n not in school_names)]
         PERSONS_JSON.write_text(json.dumps(persons_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
         rels_data = [
