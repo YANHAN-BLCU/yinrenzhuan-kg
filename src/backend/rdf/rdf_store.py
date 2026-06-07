@@ -101,8 +101,12 @@ class RDFStore:
     def get_school_members(self, school_name: str) -> List[Dict[str, Any]]:
         results = self.query_sparql(f"""
 PREFIX ex: <http://example.org/inkperson/>
-SELECT ?person ?name WHERE {{
-  ?person ex:belongsToSchool ?school .
+SELECT DISTINCT ?person ?name WHERE {{
+  {{
+    ?person ex:belongsToSchool ?school .
+  }} UNION {{
+    ?person ex:foundedSchool ?school .
+  }}
   ?school ex:schoolName "{school_name}" .
   ?person ex:personName ?name .
 }}""")

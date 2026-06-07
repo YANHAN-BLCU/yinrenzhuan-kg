@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import logging
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -16,7 +18,11 @@ app = FastAPI(title="印人传 · 知识图谱问答系统", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://127.0.0.1",
+        "http://localhost",
+        f"http://{os.environ.get('HOST', '127.0.0.1')}",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,6 +30,8 @@ app.add_middleware(
 
 _graph_data: Dict[str, Any] = {}
 _rdf_store = None
+
+_api_base = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000")
 
 
 class QARequest(BaseModel):
@@ -50,13 +58,18 @@ def _ensure_loaded():
     try:
         from backend.rdf.rdf_store import RDFStore
 
-        rdf_path = data_output / "knowledge_graph.ttl"
+        rdf_path = data_output / "linked_graph.ttl"
         if rdf_path.exists():
             _rdf_store = RDFStore().load(rdf_path)
             logger.info(f"RDF store loaded from {rdf_path}")
         else:
-            _rdf_store = RDFStore()
-            logger.info("RDF store initialized (no file yet)")
+            rdf_path = data_output / "knowledge_graph.ttl"
+            if rdf_path.exists():
+                _rdf_store = RDFStore().load(rdf_path)
+                logger.info(f"RDF store loaded from {rdf_path} (linked_graph not found)")
+            else:
+                _rdf_store = RDFStore()
+                logger.info("RDF store initialized (no file yet)")
 
         persons_path = data_output / "persons.json"
         if persons_path.exists():
@@ -77,7 +90,7 @@ def _ensure_loaded():
         logger.warning(f"Failed to preload data: {e}")
 
 
-@app.get("/")
+@app.get("/api/info")
 def root():
     return {"message": "印人传 · 知识图谱问答系统 API", "version": "1.0.0"}
 
@@ -182,6 +195,19 @@ def get_schools():
     return {"schools": schools, "count": len(schools)}
 
 
+@app.get("/api/school/{name}")
+def get_school(name: str):
+    _ensure_loaded()
+    if _rdf_store is None:
+        raise HTTPException(status_code=503, detail="知识图谱未加载")
+    try:
+        members = _rdf_store.get_school_members(name)
+        return {"school_name": name, "members": members, "count": len(members)}
+    except Exception as e:
+        logger.error(f"School query error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/analysis/centrality")
 def get_centrality():
     _ensure_loaded()
@@ -202,6 +228,35 @@ def get_communities():
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
     return {"error": "communities not available yet"}
+
+
+def _mount_frontend():
+    """Mount index.html at / and serve static assets (index_card/, data/) from project root."""
+    project_root = _get_project_root()
+    index_path = project_root / "index.html"
+    if index_path.exists():
+        from fastapi.responses import FileResponse
+        @app.get("/")
+        def serve_index():
+            return FileResponse(str(index_path))
+        logger.info(f"Frontend mounted at / -> {index_path}")
+
+        # Serve index_card/ images at /index_card/...
+        card_dir = project_root / "index_card"
+        if card_dir.exists():
+            app.mount("/index_card", StaticFiles(directory=str(card_dir)), name="index_card")
+            logger.info(f"Mounted index_card/ at /index_card/")
+
+        # Serve data/output/ at /data/... (for any future static assets)
+        data_dir = project_root / "data"
+        if data_dir.exists():
+            app.mount("/data", StaticFiles(directory=str(data_dir)), name="data")
+            logger.info(f"Mounted data/ at /data/")
+    else:
+        logger.warning(f"index.html not found at {index_path}, frontend not mounted")
+
+
+_mount_frontend()
 
 
 if __name__ == "__main__":

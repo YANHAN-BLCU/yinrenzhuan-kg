@@ -15,10 +15,15 @@ def parse_intent_node(state: QAState) -> QAState:
     entities = []
 
     import re
-    person_pattern = re.compile(r"[\u4e00-\u9fa5]{2,4}(?=的?|是|和|与|之|在|为)")
-    matches = person_pattern.findall(question)
-    for m in matches:
-        if len(m) >= 2:
+    # Match the longest prefix of Chinese chars (2+ chars) that is immediately
+    # followed by a particle or end of string. Non-greedy +? backtracks through
+    # 1,2,3,... chars until the lookahead (?=particle|$) succeeds.
+    # Filter out matches that start with a particle char (e.g. "的字" -> skip "的" as prefix).
+    PARTICLES = set("的是和为之在")
+    person_pattern = re.compile(r"[\u4e00-\u9fa5]+?(?=[的是和为之在　]|$)")
+    raw = person_pattern.findall(question)
+    for m in raw:
+        if len(m) >= 2 and m[0] not in PARTICLES:
             entities.append(m)
 
     if any(kw in question for kw in ["字", "号", "生年", "卒年", "籍贯", "朝代", "是谁"]):

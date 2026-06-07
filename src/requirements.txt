@@ -13,9 +13,9 @@ pandas==2.2.2
 sentence-transformers==2.7.0
 faiss-cpu==1.8.0
 langgraph==0.2.18
-langchain-core==0.2.21
-langchain-community==0.2.7
-langchain-openai==0.1.21
+langchain-core>=0.2.38
+langchain-community>=0.2.7
+langchain-openai>=0.1.21
 pypdf==5.1.0
 tiktoken==0.7.0
-openai==1.30.2
+openai>=1.40.0

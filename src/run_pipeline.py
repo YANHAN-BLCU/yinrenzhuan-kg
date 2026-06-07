@@ -208,6 +208,13 @@ def run_pipeline(
 
         rdf_store.save(LINKED_OUTPUT)
         logger.info(f"Linked graph saved: {LINKED_OUTPUT}")
+    else:
+        # Even when skipping linking, save the RDF graph so downstream stages
+        # and API can load from linked_graph.ttl consistently.
+        from src.backend.rdf.rdf_store import RDFStore
+        linked_store = RDFStore(writer.get_graph())
+        linked_store.save(LINKED_OUTPUT)
+        logger.info(f"Copied graph to linked_graph.ttl (linking skipped)")
 
     logger.info(f"=== Stage 5: Graph Analysis ===")
     if not skip_analysis:

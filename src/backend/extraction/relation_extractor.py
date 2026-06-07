@@ -86,7 +86,7 @@ class RelationExtractor:
                 style_chunk = chunk.replace(subj, "")
                 # Remove all punctuation and 字号 markers
                 style = re.sub(r"^[，,\s]+(?:字|號|一字|亦稱)", "", style_chunk)
-                style = style.strip("，,\s")
+                style = style.strip(r"，,\s")
                 # Take only the first part before the next comma/号
                 if style:
                     # Only take the first name/surname part
