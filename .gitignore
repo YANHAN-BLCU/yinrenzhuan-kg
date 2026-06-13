@@ -5,7 +5,3 @@ venv/
 .env
 .DS_Store
 Thumbs.db
-data/output/
-*.ttl
-*.json
-*.csv

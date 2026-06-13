@@ -18,7 +18,7 @@
 │  《印人传》原文  │  ctext 人物条目  │  cbdb 人物条目              │
 ├─────────────────────────────────────────────────────────────────┤
 │  抽取层                                                          │
-│  规则预处理  │  Trie 字典匹配  │  正则关系抽取  │  大模型兜底      │
+│  SikuRoBERTa 断句  │  正则规则抽取  │  大模型兜底抽取            │
 ├─────────────────────────────────────────────────────────────────┤
 │  图谱层                                                          │
 │  RDF/Turtle 构建  │  实体链接(ctext/cbdb)  │  知识融合与消歧      │
@@ -35,21 +35,19 @@
 
 ### 1. 知识抽取
 
-采用**"古文预处理 → Trie 字典匹配 → 正则关系抽取 → 知识库补全"**的混合方案：
+采用**"古文预处理 → 规则正则优先 → 大模型兜底"**的混合方案：
 
-- **古文预处理**：繁简转换、异体字规范化（opencc）
-- **Trie 字典匹配**：高效匹配人名、地名、字号、官职，解决重叠人名问题
-- **正则关系抽取**：师生、学派归属、籍贯、字号等关系的上下文验证
-- **知识库补全**：硬编码核心三元组，确保图谱质量基础
+- **古文预处理**：SikuRoBERTa（《四库全书》5.36 亿字语料预训练）辅助断句标点、繁简转换、异体字规范化
+- **规则抽取**：正则词典匹配人名、地名、时间、字号、官职；模板触发关系抽取（父子、师徒、流派等）
 - **大模型兜底**：调用 Qwen2.5-Instruct（Ollama 本地部署）对复杂描述句进行关系推理
 
 **抽取实体类型**：
 
 | 类型 | 示例 | 方法 |
 |------|------|------|
-| 人物（印人） | 文彭、何震、丁敬 | Trie 字典匹配 |
+| 人物（印人） | 文彭、何震、丁敬 | 正则词典 + SikuRoBERTa NER |
 | 字号 | 寿承（字）、三桥（号） | 正则模板匹配 |
-| 地名 | 苏州、吴门、杭州、西泠 | Trie 字典匹配 |
+| 地名 | 苏州、吴门、杭州、西泠 | 正则词典匹配 |
 | 时间 | 嘉靖、万历、明末、清初 | 正则词表匹配 |
 | 流派/印风 | 吴门印派、浙派、秦汉印风 | 正则词典匹配 |
 | 官职/身份 | 秀才、知州、隐士 | 正则 + NER 补充 |
@@ -187,61 +185,23 @@ generate_answer          execute_sparql
 ├── 印人傳.epub                   # 《印人传》电子书
 ├── 项目方案.md                   # 完整技术文档（1000+ 行）
 ├── 前端设计参考.md               # 前端设计规范与参考
-├── README.md                     # 本文件
-└── src/                          # 后端 Python 代码
-    ├── main.py                   # FastAPI 服务入口
-    ├── run_pipeline.py           # 知识图谱构建流水线
-    ├── requirements.txt          # Python 依赖
-    └── backend/
-        ├── extraction/           # 知识抽取模块
-        │   ├── text_processor.py     # 文本预处理
-        │   ├── ner_rules.py          # NER 规则（字典匹配）
-        │   ├── relation_extractor.py # 关系抽取
-        │   ├── llm_extractor.py     # 大模型兜底抽取
-        │   └── knowledge_base.py     # 核心知识库（硬编码三元组）
-        ├── rdf/                   # RDF 图谱模块
-        │   ├── ontology.py            # 本体定义（OWL）
-        │   ├── turtle_writer.py       # Turtle 序列化
-        │   └── rdf_store.py          # RDF 存储与 SPARQL 查询
-        ├── linking/               # 实体链接模块
-        │   ├── ctext_client.py        # ctext.org API
-        │   ├── cbdb_client.py         # CBDB API
-        │   ├── linker.py              # 实体链接器
-        │   └── knowledge_merger.py    # 知识融合
-        ├── graph_analysis/        # 图分析模块
-        │   ├── centrality.py          # 中心性分析
-        │   ├── community.py           # 社区发现（Louvain）
-        │   └── path_finder.py         # 最短路径查询
-        ├── qa/                    # 问答系统模块
-        │   ├── state.py               # LangGraph 状态定义
-        │   ├── nodes.py               # 工作流节点
-        │   ├── workflow.py            # LangGraph 工作流
-        │   ├── tools.py               # 本地工具集
-        │   ├── sparql_generator.py    # SPARQL 生成
-        │   └── rag/                   # RAG 模块
-        │       ├── embedding.py       # 向量嵌入
-        │       ├── vector_index.py   # FAISS 索引
-        │       └── retriever.py      # 检索器
-        └── utils/
-            └── config.py              # 配置管理
+└── README.md                     # 本文件
 ```
 
 ## 技术栈
 
 | 模块 | 技术 | 说明 |
 |------|------|------|
-| 后端框架 | FastAPI + Uvicorn | RESTful API 服务 |
-| 文本预处理 | Python + opencc | 繁简转换、异体字规范化 |
-| 实体抽取 | Trie 字典匹配 | 人名、地名、字号高效匹配 |
-| 关系抽取 | 正则规则 + 上下文验证 | 师生、学派、籍贯等关系 |
+| 文本预处理 | SikuRoBERTa | 古籍专用预训练模型，辅助断句与 NER |
+| 实体抽取 | Python + regex + pydantic | 规则抽取 + 结构化输出验证 |
 | 大模型 | Qwen2.5-Instruct（Ollama） | 本地部署，兜底抽取与问答生成 |
 | RDF 存储 | rdflib | Python RDF 库，Turtle 格式 |
 | SPARQL 查询 | rdflib SPARQL | 图谱查询语言 |
-| 向量检索 | FAISS + sentence-transformers | 原文向量索引 |
+| 向量检索 | FAISS | 档案原文向量索引 |
 | 图分析 | NetworkX + python-louvain | 中心性、PageRank、社区发现 |
 | 问答编排 | LangGraph | StateGraph 工作流 |
 | 前端 | HTML + CSS + D3.js | 单文件，力导向图可视化 |
-| 外部数据 | ctext + CBDB | 实体链接与知识补充（预留接口）|
+| 外部数据 | ctext + CBDB | 实体链接与知识补充 |
 
 **全部功能基于 Python 及其生态库实现，无需独立图数据库或中间件。**
 
@@ -271,23 +231,11 @@ generate_answer          execute_sparql
 
 ## 使用方式
 
-### 后端服务
+本项目为课程设计项目，核心文件为：
 
-```bash
-cd src
-pip install -r requirements.txt
-python main.py
-# 服务运行于 http://127.0.0.1:8000
-# API 文档: http://127.0.0.1:8000/docs
-```
-
-### 知识图谱构建
-
-```bash
-cd src
-python run_pipeline.py
-# 输出: data/output/knowledge_graph.ttl
-```
+1. **`项目方案.md`** — 完整技术文档，包含所有模块的设计方案、代码示例、本体定义
+2. **`index.html`** — 可直接在浏览器中打开的前端页面
+3. **`印人傳.txt`** — 原始语料
 
 ### 浏览前端
 
@@ -314,9 +262,9 @@ start index.html
 |------|------|------|
 | ctext | https://ctext.org | 中国哲学书电子化计划 |
 | CBDB | https://cbdb.fas.harvard.edu | 中国历代人物传记资料库（哈佛大学） |
-| Ollama | https://ollama.com | 本地大模型运行平台 |
-| rdflib | https://rdflib.readthedocs.io | Python RDF 库文档 |
-| LangGraph | https://langchain-ai.github.io/langgraph/ | 问答工作流编排 |
+| SikuRoBERTa | Hugging Face | 《四库全书》语料预训练模型 |
+| Shiji-KB | GitHub | 《史记》知识库标注体系参考 |
+| CHisIEC | — | 古籍信息抽取语料参考 |
 
 ---
 
