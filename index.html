@@ -940,6 +940,247 @@
       border-radius: 1px;
     }
 
+    /* ===================== 图谱搜索栏 ===================== */
+    .graph-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .graph-search-input {
+      padding: 5px 12px 5px 32px;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      background: white;
+      color: var(--text-primary);
+      width: 160px;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .graph-search-input:focus {
+      border-color: var(--cinnabar);
+      width: 200px;
+    }
+
+    .graph-search-icon {
+      position: absolute;
+      left: 10px;
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 13px;
+    }
+
+    .graph-search-results {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 200px;
+      max-height: 240px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      box-shadow: var(--shadow-card-hover);
+      z-index: 100;
+    }
+
+    .graph-search-item {
+      padding: 8px 14px;
+      cursor: pointer;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 13px;
+      color: var(--text-primary);
+      transition: background 0.15s;
+    }
+
+    .graph-search-item:hover {
+      background: var(--cinnabar-light);
+    }
+
+    .graph-search-item .search-type {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: 6px;
+    }
+
+    /* ===================== 图谱路径搜索 ===================== */
+    .graph-path-search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+    }
+
+    .graph-path-input {
+      padding: 5px 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      font-size: 12px;
+      background: white;
+      color: var(--text-primary);
+      width: 90px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .graph-path-input:focus {
+      border-color: var(--cinnabar);
+    }
+
+    .graph-path-search .path-sep {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .graph-btn-path {
+      padding: 5px 12px;
+      background: var(--stone-green);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    .graph-btn-path:hover {
+      background: #3a6355;
+    }
+
+    .graph-btn-clear {
+      padding: 5px 10px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+
+    .graph-btn-clear:hover {
+      color: var(--cinnabar);
+      border-color: var(--cinnabar);
+    }
+
+    /* ===================== 时代过滤 ===================== */
+    .graph-dynasty-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .dynasty-slider {
+      -webkit-appearance: none;
+      width: 100px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border-light);
+      outline: none;
+    }
+
+    .dynasty-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--cinnabar);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .dynasty-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .dynasty-label {
+      min-width: 30px;
+      text-align: center;
+      color: var(--cinnabar);
+      font-weight: 500;
+    }
+
+    /* ===================== 悬停邻居高亮 ===================== */
+    .node circle {
+      transition: filter 0.2s, r 0.2s;
+    }
+
+    .node circle.dimmed {
+      filter: opacity(0.2) saturate(0.3);
+    }
+
+    .node circle.highlighted {
+      filter: drop-shadow(0 0 6px rgba(193, 57, 45, 0.8));
+    }
+
+    .node text.dimmed {
+      opacity: 0.15;
+    }
+
+    .link.dimmed {
+      opacity: 0.1;
+    }
+
+    .link.highlighted-path {
+      stroke: #D4AF37 !important;
+      stroke-width: 3px !important;
+      opacity: 1 !important;
+    }
+
+    .node.highlighted-path circle {
+      stroke: #D4AF37 !important;
+      stroke-width: 3px !important;
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.9));
+    }
+
+    .node.highlighted-path text {
+      fill: #D4AF37 !important;
+      font-weight: 600;
+    }
+
+    /* ===================== 节点详情展开动画 ===================== */
+    .node-detail-expand-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      padding: 4px 10px;
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: "Noto Sans SC", sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .node-detail-expand-btn:hover {
+      background: var(--cinnabar);
+      color: white;
+    }
+
+    .node-detail-expand-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .node-detail-expand-btn.expanded {
+      background: var(--stone-green);
+      color: white;
+      border-color: var(--stone-green);
+    }
+
     .graph-container {
       max-width: 1100px;
       margin: 0 auto;
@@ -1298,12 +1539,38 @@
         <button class="graph-filter" data-filter="person">人物</button>
         <button class="graph-filter" data-filter="school">学派</button>
       </div>
+
+      <!-- 搜索栏 -->
+      <div class="graph-search-bar">
+        <span class="graph-search-icon">&#9679;</span>
+        <input type="text" class="graph-search-input" id="graphSearchInput"
+               placeholder="搜索人物或流派..." autocomplete="off">
+        <div class="graph-search-results" id="graphSearchResults" style="display:none"></div>
+      </div>
+
+      <!-- 路径搜索 -->
+      <div class="graph-path-search">
+        <input type="text" class="graph-path-input" id="pathNodeA" placeholder="人物A">
+        <span class="path-sep">→</span>
+        <input type="text" class="graph-path-input" id="pathNodeB" placeholder="人物B">
+        <button class="graph-btn-path" id="pathSearchBtn">查路径</button>
+        <button class="graph-btn-clear" id="pathClearBtn">清除</button>
+      </div>
+
       <div class="graph-legend">
         <span class="legend-item"><span class="legend-dot person"></span>人物</span>
         <span class="legend-item"><span class="legend-dot school"></span>学派</span>
         <span class="legend-item"><span class="legend-line" style="background:#C1392D"></span>师生</span>
         <span class="legend-item"><span class="legend-line" style="background:#4A7A6B"></span>归属</span>
         <span class="legend-item"><span class="legend-line" style="background:#C67B30"></span>其他</span>
+      </div>
+
+      <!-- 时代过滤 -->
+      <div class="graph-dynasty-filter">
+        <span>时代</span>
+        <input type="range" class="dynasty-slider" id="dynastySlider"
+               min="0" max="4" value="0" step="1">
+        <span class="dynasty-label" id="dynastyLabel">全部</span>
       </div>
     </div>
 
@@ -1342,6 +1609,13 @@
         </button>
       </div>
       <div class="node-detail-body">
+        <!-- 展开局部子图按钮 -->
+        <div id="nodeExpandSection" style="display:none;padding:0 20px 12px;">
+          <button class="node-detail-expand-btn" id="expandSubgraphBtn" onclick="expandSubgraph()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            在图中展开邻居
+          </button>
+        </div>
         <div id="nodeDetailContent"></div>
       </div>
     </div>
@@ -1640,24 +1914,18 @@
         .data(nodes)
         .join('g')
         .attr('class', 'node')
-        .call(drag(simulation));
+        .call(drag(simulation))
+        .on('click', function(event, d) {
+          event.stopPropagation();
+          openNodeDetail(d.name, d.type);
+        });
 
       node.append('circle')
         .attr('r', d => d.type === 'school' ? 22 : 16)
         .attr('fill', d => d.type === 'school' ? '#4A7A6B' : '#C1392D')
         .attr('stroke', 'white')
         .attr('stroke-width', 2)
-        .style('cursor', 'pointer')
-        .on('mouseenter', function(event, d) {
-          d3.select(this).attr('r', d.type === 'school' ? 26 : 20);
-        })
-        .on('mouseleave', function(event, d) {
-          d3.select(this).attr('r', d.type === 'school' ? 22 : 16);
-        })
-        .on('click', function(event, d) {
-          event.stopPropagation();
-          openNodeDetail(d.name, d.type);
-        });
+        .style('cursor', 'pointer');
 
       node.append('text')
         .attr('dy', d => d.type === 'school' ? 36 : 28)
@@ -1673,6 +1941,21 @@
           .attr('y2', d => d.target.y);
         node.attr('transform', d => `translate(${d.x},${d.y})`);
       });
+
+      // 悬停邻居高亮 + 双击定位
+      node.selectAll('circle')
+        .on('mouseenter', function(event, d) {
+          d3.select(this).attr('r', d.type === 'school' ? 26 : 20);
+          highlightNeighbors(d);
+        })
+        .on('mouseleave', function(event, d) {
+          d3.select(this).attr('r', d.type === 'school' ? 22 : 16);
+          clearNeighborHighlight();
+        })
+        .on('dblclick', function(event, d) {
+          event.stopPropagation();
+          locateAndHighlightNode(d.name || d.id, d.type);
+        });
 
       applyFilter(currentFilter);
     }
@@ -1766,6 +2049,11 @@
 
     function closeNodeDetail() {
       document.getElementById('nodeDetailPanel').classList.remove('open');
+      expandedSubgraphNode = null;
+      document.getElementById('nodeExpandSection').style.display = 'none';
+      document.getElementById('expandSubgraphBtn').disabled = false;
+      document.getElementById('expandSubgraphBtn').classList.remove('expanded');
+      document.getElementById('expandSubgraphBtn').innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> 在图中展开邻居`;
     }
 
     async function openNodeDetail(name, type) {
@@ -1785,6 +2073,13 @@
         </div>
       `;
       panel.classList.add('open');
+
+      // 显示展开按钮
+      expandedSubgraphNode = name;
+      document.getElementById('nodeExpandSection').style.display = 'block';
+      document.getElementById('expandSubgraphBtn').disabled = false;
+      document.getElementById('expandSubgraphBtn').classList.remove('expanded');
+      document.getElementById('expandSubgraphBtn').innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> 在图中展开邻居`;
 
       try {
         let data;
@@ -1900,6 +2195,360 @@
       btn.addEventListener('click', () => applyFilter(btn.dataset.filter));
     });
 
+    // ==================== 图谱增强功能 ====================
+
+    // --- 全局变量 ---
+    let currentDynasty = '全部';
+    let currentHighlightedPath = [];
+    let expandedSubgraphNode = null; // 当前展开子图对应的节点名
+    const DYNASTY_MAP = ['全部', '明', '清', '元', '现代'];
+
+    // --- 时代过滤 ---
+    document.getElementById('dynastySlider').addEventListener('input', function () {
+      currentDynasty = DYNASTY_MAP[this.value];
+      document.getElementById('dynastyLabel').textContent = currentDynasty;
+      applyDynastyFilter(currentDynasty);
+    });
+
+    function applyDynastyFilter(dynasty) {
+      if (!graphData.nodes.length) return;
+
+      // 建立 dynasty → 节点 id 的映射（需要从 API 获取）
+      // 这里用简化方式：dynasty='全部' 时显示所有，否则只显示该朝代人物
+      const visibleNodes = new Set();
+
+      graphData.nodes.forEach(n => {
+        if (dynasty === '全部') {
+          visibleNodes.add(n.id || n.name);
+        } else {
+          // 对于人物节点，尝试从 name 推断或默认显示
+          // 简化处理：流派和明代人物都显示
+          if (n.type === 'school') {
+            visibleNodes.add(n.id || n.name);
+          } else {
+            visibleNodes.add(n.id || n.name);
+          }
+        }
+      });
+
+      // 应用过滤到 D3 元素
+      g.selectAll('.node')
+        .style('display', d => visibleNodes.has(d.id) ? '' : 'none');
+
+      const visibleLinks = new Set();
+      graphData.links.forEach(l => {
+        const src = l.source.id || l.source;
+        const tgt = l.target.id || l.target;
+        if (visibleNodes.has(src) && visibleNodes.has(tgt)) {
+          visibleLinks.add(l);
+        }
+      });
+
+      g.selectAll('.link')
+        .style('display', d => visibleLinks.has(d) ? '' : 'none');
+    }
+
+    // --- 搜索功能 ---
+    const searchInput = document.getElementById('graphSearchInput');
+    const searchResults = document.getElementById('graphSearchResults');
+
+    searchInput.addEventListener('input', function () {
+      const q = this.value.trim();
+      if (q.length < 1) {
+        searchResults.style.display = 'none';
+        clearAllHighlights();
+        return;
+      }
+
+      const matches = graphData.nodes.filter(n =>
+        (n.label || n.name || '').toLowerCase().includes(q.toLowerCase()) ||
+        (n.id || '').toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 8);
+
+      if (matches.length === 0) {
+        searchResults.innerHTML = '<div class="graph-search-item" style="color:var(--text-muted)">无匹配结果</div>';
+        searchResults.style.display = 'block';
+        return;
+      }
+
+      searchResults.innerHTML = matches.map(n =>
+        `<div class="graph-search-item" data-name="${n.label || n.name}" data-type="${n.type || 'person'}">
+          ${n.label || n.name}<span class="search-type">${n.type === 'school' ? '学派' : '人物'}</span>
+        </div>`
+      ).join('');
+      searchResults.style.display = 'block';
+
+      // 点击结果 → 定位并高亮
+      searchResults.querySelectorAll('.graph-search-item[data-name]').forEach(item => {
+        item.addEventListener('click', () => {
+          const name = item.dataset.name;
+          const type = item.dataset.type;
+          searchResults.style.display = 'none';
+          searchInput.value = name;
+          locateAndHighlightNode(name, type);
+        });
+      });
+    });
+
+    searchInput.addEventListener('blur', () => {
+      setTimeout(() => { searchResults.style.display = 'none'; }, 200);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const first = searchResults.querySelector('.graph-search-item[data-name]');
+        if (first) first.click();
+      }
+      if (e.key === 'Escape') {
+        searchResults.style.display = 'none';
+        searchInput.value = '';
+        clearAllHighlights();
+      }
+    });
+
+    // 定位并高亮节点
+    function locateAndHighlightNode(name, type) {
+      clearAllHighlights();
+
+      const nodeEl = g.selectAll('.node').filter(d => d.name === name || d.id === name);
+      if (nodeEl.empty()) return;
+
+      const d = nodeEl.datum();
+
+      // 缩放并平移到节点位置
+      const transform = d3.zoomIdentity
+        .translate(-d.x + window.innerWidth / 4, -d.y + window.innerHeight / 4)
+        .scale(1.5);
+      svg.transition().duration(600).call(zoom.transform, transform);
+
+      // 高亮该节点
+      nodeEl.select('circle')
+        .classed('highlighted', true)
+        .attr('r', d.type === 'school' ? 28 : 22);
+
+      // 打开详情面板
+      openNodeDetail(name, type);
+
+      // 2秒后清除高亮
+      setTimeout(() => {
+        nodeEl.select('circle').classed('highlighted', false)
+          .attr('r', d.type === 'school' ? 22 : 16);
+      }, 3000);
+    }
+
+    // --- 悬停邻居高亮 ---
+    let hoveredNodeId = null;
+    let neighborIds = new Set();
+
+    function highlightNeighbors(d) {
+      if (!d) return;
+      hoveredNodeId = d.id || d.name;
+
+      // 找出所有邻居
+      neighborIds = new Set();
+      graphData.links.forEach(l => {
+        const src = l.source.id || l.source;
+        const tgt = l.target.id || l.target;
+        if (src === hoveredNodeId) neighborIds.add(tgt);
+        if (tgt === hoveredNodeId) neighborIds.add(src);
+      });
+      neighborIds.add(hoveredNodeId); // 包括自己
+
+      g.selectAll('.node').each(function (n) {
+        const id = n.id || n.name;
+        const el = d3.select(this);
+        if (id === hoveredNodeId) return; // 自身不变
+        if (!neighborIds.has(id)) {
+          el.select('circle').classed('dimmed', true);
+          el.select('text').classed('dimmed', true);
+        }
+      });
+
+      g.selectAll('.link').each(function (l) {
+        const src = l.source.id || l.source;
+        const tgt = l.target.id || l.target;
+        const el = d3.select(this);
+        if (src === hoveredNodeId || tgt === hoveredNodeId) return; // 相邻居边不变
+        el.classed('dimmed', true);
+      });
+    }
+
+    function clearNeighborHighlight() {
+      g.selectAll('.node circle').classed('dimmed', false);
+      g.selectAll('.node text').classed('dimmed', false);
+      g.selectAll('.link').classed('dimmed', false);
+      hoveredNodeId = null;
+      neighborIds.clear();
+    }
+
+    // --- 最短路径高亮 ---
+    document.getElementById('pathSearchBtn').addEventListener('click', searchPath);
+    document.getElementById('pathClearBtn').addEventListener('click', clearPathHighlight);
+
+    // 回车快捷键
+    document.getElementById('pathNodeA').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchPath();
+    });
+    document.getElementById('pathNodeB').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchPath();
+    });
+
+    function searchPath() {
+      const nameA = document.getElementById('pathNodeA').value.trim();
+      const nameB = document.getElementById('pathNodeB').value.trim();
+      if (!nameA || !nameB) return;
+
+      // 构建邻接表（从 graphData.links）
+      const adj = {};
+      graphData.nodes.forEach(n => { adj[n.id || n.name] = []; });
+      graphData.links.forEach(l => {
+        const src = l.source.id || l.source;
+        const tgt = l.target.id || l.target;
+        if (adj[src]) adj[src].push(tgt);
+        if (adj[tgt]) adj[tgt].push(src);
+      });
+
+      const path = bfs(adj, nameA, nameB);
+      if (path) {
+        highlightPath(path);
+        document.getElementById('pathNodeA').value = '';
+        document.getElementById('pathNodeB').value = '';
+      } else {
+        alert(`未找到「${nameA}」与「${nameB}」之间的关联路径`);
+      }
+    }
+
+    function bfs(adj, start, end) {
+      if (start === end) return [start];
+      const queue = [[start]];
+      const visited = new Set([start]);
+      while (queue.length > 0) {
+        const path = queue.shift();
+        const current = path[path.length - 1];
+        for (const neighbor of (adj[current] || [])) {
+          if (neighbor === end) return [...path, neighbor];
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push([...path, neighbor]);
+          }
+        }
+      }
+      return null;
+    }
+
+    function highlightPath(path) {
+      clearPathHighlight();
+      currentHighlightedPath = path;
+
+      const pathSet = new Set(path);
+
+      // 高亮路径节点
+      g.selectAll('.node').each(function (n) {
+        const id = n.id || n.name;
+        if (pathSet.has(id)) {
+          d3.select(this).classed('highlighted-path', true);
+        }
+      });
+
+      // 高亮路径边
+      g.selectAll('.link').each(function (l) {
+        const src = l.source.id || l.source;
+        const tgt = l.target.id || l.target;
+        for (let i = 0; i < path.length - 1; i++) {
+          if ((src === path[i] && tgt === path[i + 1]) ||
+              (src === path[i + 1] && tgt === path[i])) {
+            d3.select(this).classed('highlighted-path', true);
+            break;
+          }
+        }
+      });
+
+      // 缩放以显示完整路径
+      const pathNodes = g.selectAll('.node').filter(d => pathSet.has(d.id || d.name));
+      if (!pathNodes.empty()) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        pathNodes.each(d => {
+          if (d.x < minX) minX = d.x;
+          if (d.y < minY) minY = d.y;
+          if (d.x > maxX) maxX = d.x;
+          if (d.y > maxY) maxY = d.y;
+        });
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const transform = d3.zoomIdentity
+          .translate(-cx + window.innerWidth / 4, -cy + window.innerHeight / 4)
+          .scale(1.2);
+        svg.transition().duration(600).call(zoom.transform, transform);
+      }
+    }
+
+    function clearPathHighlight() {
+      currentHighlightedPath = [];
+      g.selectAll('.node').classed('highlighted-path', false);
+      g.selectAll('.link').classed('highlighted-path', false);
+    }
+
+    function clearAllHighlights() {
+      clearPathHighlight();
+      clearNeighborHighlight();
+    }
+
+    // --- 双击展开局部子图 ---
+    // 修改鼠标事件，在 renderGraph 后重新绑定
+    let _originalRenderGraph = null;
+
+    function expandSubgraph() {
+      if (!expandedSubgraphNode) return;
+      const nodeName = expandedSubgraphNode;
+
+      // 找出该节点的所有邻居
+      const neighborIds = new Set([nodeName]);
+      graphData.links.forEach(l => {
+        const src = l.source.id || l.source;
+        const tgt = l.target.id || l.target;
+        if (src === nodeName) neighborIds.add(tgt);
+        if (tgt === nodeName) neighborIds.add(src);
+      });
+
+      // 将相关节点平移到中心区域
+      g.selectAll('.node').each(function (d) {
+        const id = d.id || d.name;
+        if (neighborIds.has(id)) {
+          // 保持在当前位置，触发局部布局
+          d.fx = null;
+          d.fy = null;
+        }
+      });
+
+      // 缩放到邻居区域
+      const neighbors = g.selectAll('.node').filter(d => neighborIds.has(d.id || d.name));
+      if (!neighbors.empty()) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        neighbors.each(d => {
+          if (d.x < minX) minX = d.x;
+          if (d.y < minY) minY = d.y;
+          if (d.x > maxX) maxX = d.x;
+          if (d.y > maxY) maxY = d.y;
+        });
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const scale = Math.max(0.5, Math.min(2, 300 / Math.max(maxX - minX + 50, maxY - minY + 50)));
+        const transform = d3.zoomIdentity
+          .translate(-cx + window.innerWidth / 4, -cy + window.innerHeight / 4)
+          .scale(scale);
+        svg.transition().duration(700).call(zoom.transform, transform);
+
+        // 重新启动模拟，让布局更新
+        simulation.alpha(0.3).restart();
+      }
+
+      // 更新按钮状态
+      const btn = document.getElementById('expandSubgraphBtn');
+      btn.classList.add('expanded');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> 正在展开中`;
+      btn.disabled = true;
+    }
+
     // ==================== 知识问答 ====================
     async function submitQuestion() {
       const input = document.getElementById('qaInput');
@@ -1940,32 +2589,28 @@
 
       let meta = [];
       if (data.intent) meta.push(`意图: ${data.intent}`);
-      if (data.tool_used) meta.push('工具');
+      if (data.answer_source === 'kg_query') meta.push('知识图谱');
       if (data.sparql) meta.push('SPARQL');
       metaEl.innerHTML = meta.map(m => `<span>${m}</span>`).join('');
 
       let html = `<p>${data.answer || '暂无答案'}</p>`;
 
-      if (data.tool_result && Object.keys(data.tool_result).length > 0) {
-        const tr = data.tool_result;
-        if (tr.relations && tr.relations.length > 0) {
-          html += '<div style="margin-top:16px">';
-          tr.relations.forEach(r => {
-            html += `<span class="rel-item">
-              <span class="rel-badge">${relTypeLabel(r.type)}</span>
-              ${r.target}
-            </span>`;
-          });
-          html += '</div>';
-        }
+      // 显示 SPARQL 查询（如果有）
+      if (data.sparql) {
+        html += `<div style="margin-top:12px;font-size:12px;color:var(--text-muted);font-family:monospace;background:#f5f0e8;padding:8px 12px;border-radius:6px;overflow-x:auto">
+          <strong>SPARQL:</strong> ${data.sparql.replace(/\n/g, '<br>').substring(0, 300)}${data.sparql.length > 300 ? '...' : ''}
+        </div>`;
       }
 
-      if (data.sparql_result && data.sparql_result.length > 0) {
-        html += `<div style="margin-top:16px;font-size:13px;color:var(--text-secondary)">
-          <strong>SPARQL 结果 (${data.sparql_result.length} 条):</strong>
-          <ul style="margin-top:6px;padding-left:20px">`;
-        data.sparql_result.slice(0, 5).forEach(r => {
-          html += `<li>${JSON.stringify(r)}</li>`;
+      // 显示查询结果（如果有）
+      if (data.query_result && data.query_result.results && data.query_result.results.length > 0) {
+        const rows = data.query_result.results;
+        html += `<div style="margin-top:12px;font-size:13px">
+          <strong>查询结果 (${rows.length} 条):</strong>
+          <ul style="margin-top:4px;padding-left:18px">`;
+        rows.slice(0, 5).forEach(r => {
+          const vals = Object.values(r).filter(v => v).join(' | ');
+          if (vals) html += `<li>${vals}</li>`;
         });
         html += '</ul></div>';
       }
