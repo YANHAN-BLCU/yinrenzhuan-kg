@@ -1,32 +1,8 @@
 {
   "nodes": [
     {
-      "id": "何震",
-      "name": "何震",
-      "type": "person",
-      "school": "belongsToSchool"
-    },
-    {
-      "id": "文彭",
-      "name": "文彭",
-      "type": "person",
-      "school": "foundedSchool"
-    },
-    {
-      "id": "文徵明",
-      "name": "文徵明",
-      "type": "person",
-      "school": "belongsToSchool"
-    },
-    {
-      "id": "school/吳門印派",
-      "name": "吳門印派",
-      "type": "school",
-      "school": null
-    },
-    {
-      "id": "程邃",
-      "name": "程邃",
+      "id": "蘇宣",
+      "name": "蘇宣",
       "type": "person",
       "school": "belongsToSchool"
     },
@@ -37,44 +13,14 @@
       "school": null
     },
     {
-      "id": "梁千秋",
-      "name": "梁千秋",
-      "type": "person",
-      "school": "belongsToSchool"
-    },
-    {
       "id": "丁敬",
       "name": "丁敬",
       "type": "person",
-      "school": "foundedSchool"
+      "school": null
     },
     {
       "id": "school/浙派",
       "name": "浙派",
-      "type": "school",
-      "school": null
-    },
-    {
-      "id": "金一甫",
-      "name": "金一甫",
-      "type": "person",
-      "school": "belongsToSchool"
-    },
-    {
-      "id": "黃學",
-      "name": "黃學",
-      "type": "person",
-      "school": "belongsToSchool"
-    },
-    {
-      "id": "蘇宣",
-      "name": "蘇宣",
-      "type": "person",
-      "school": "belongsToSchool"
-    },
-    {
-      "id": "school/莆田派",
-      "name": "莆田派",
       "type": "school",
       "school": null
     },
@@ -91,10 +37,34 @@
       "school": null
     },
     {
+      "id": "梁千秋",
+      "name": "梁千秋",
+      "type": "person",
+      "school": "belongsToSchool"
+    },
+    {
+      "id": "school/吳門印派",
+      "name": "吳門印派",
+      "type": "school",
+      "school": null
+    },
+    {
       "id": "劉漁仲",
       "name": "劉漁仲",
       "type": "person",
       "school": "belongsToSchool"
+    },
+    {
+      "id": "何震",
+      "name": "何震",
+      "type": "person",
+      "school": "belongsToSchool"
+    },
+    {
+      "id": "文彭",
+      "name": "文彭",
+      "type": "person",
+      "school": null
     },
     {
       "id": "萬年少",
@@ -119,98 +89,68 @@
       "name": "漳海派",
       "type": "school",
       "school": null
+    },
+    {
+      "id": "程邃",
+      "name": "程邃",
+      "type": "person",
+      "school": "belongsToSchool"
+    },
+    {
+      "id": "金一甫",
+      "name": "金一甫",
+      "type": "person",
+      "school": "belongsToSchool"
+    },
+    {
+      "id": "文徵明",
+      "name": "文徵明",
+      "type": "person",
+      "school": "belongsToSchool"
+    },
+    {
+      "id": "school/莆田派",
+      "name": "莆田派",
+      "type": "school",
+      "school": null
+    },
+    {
+      "id": "黃學",
+      "name": "黃學",
+      "type": "person",
+      "school": "belongsToSchool"
     }
   ],
   "links": [
     {
-      "source": "何震",
-      "target": "文彭",
-      "relation": "studentOf"
-    },
-    {
-      "source": "何震",
-      "target": "梁千秋",
-      "relation": "teacherOf"
-    },
-    {
-      "source": "何震",
-      "target": "school/吳門印派",
-      "relation": "belongsToSchool"
-    },
-    {
-      "source": "何震",
-      "target": "蘇宣",
-      "relation": "teacherOf"
-    },
-    {
-      "source": "文彭",
-      "target": "school/吳門印派",
-      "relation": "foundedSchool"
-    },
-    {
-      "source": "文彭",
-      "target": "何震",
-      "relation": "teacherOf"
-    },
-    {
-      "source": "文徵明",
-      "target": "school/吳門印派",
-      "relation": "belongsToSchool"
-    },
-    {
-      "source": "文徵明",
-      "target": "文彭",
-      "relation": "teacherOf"
-    },
-    {
-      "source": "程邃",
+      "source": "蘇宣",
       "target": "school/皖派",
       "relation": "belongsToSchool"
     },
     {
-      "source": "梁千秋",
-      "target": "何震",
-      "relation": "studentOf"
-    },
-    {
-      "source": "梁千秋",
-      "target": "school/吳門印派",
-      "relation": "belongsToSchool"
+      "source": "蘇宣",
+      "target": "文彭",
+      "relation": "hasStudent"
     },
     {
       "source": "丁敬",
       "target": "school/浙派",
-      "relation": "foundedSchool"
-    },
-    {
-      "source": "金一甫",
-      "target": "何震",
-      "relation": "studentOf"
-    },
-    {
-      "source": "金一甫",
-      "target": "school/莆田派",
-      "relation": "belongsToSchool"
-    },
-    {
-      "source": "黃學",
-      "target": "school/吳門印派",
-      "relation": "belongsToSchool"
-    },
-    {
-      "source": "蘇宣",
-      "target": "文彭",
-      "relation": "studentOf"
-    },
-    {
-      "source": "蘇宣",
-      "target": "school/皖派",
-      "relation": "belongsToSchool"
+      "relation": "hasFounder"
     },
     {
       "source": "張穉恭",
       "target": "school/婁東派",
       "relation": "belongsToSchool"
+    },
+    {
+      "source": "梁千秋",
+      "target": "school/吳門印派",
+      "relation": "belongsToSchool"
+    },
+    {
+      "source": "梁千秋",
+      "target": "何震",
+      "relation": "hasStudent"
     },
     {
       "source": "劉漁仲",
@@ -220,16 +160,76 @@
     {
       "source": "劉漁仲",
       "target": "程邃",
-      "relation": "studentOf"
+      "relation": "hasStudent"
+    },
+    {
+      "source": "何震",
+      "target": "文彭",
+      "relation": "hasStudent"
+    },
+    {
+      "source": "何震",
+      "target": "蘇宣",
+      "relation": "hasTeacher"
+    },
+    {
+      "source": "何震",
+      "target": "梁千秋",
+      "relation": "hasTeacher"
+    },
+    {
+      "source": "何震",
+      "target": "school/吳門印派",
+      "relation": "belongsToSchool"
+    },
+    {
+      "source": "文彭",
+      "target": "school/吳門印派",
+      "relation": "hasFounder"
+    },
+    {
+      "source": "文彭",
+      "target": "何震",
+      "relation": "hasTeacher"
     },
     {
       "source": "萬年少",
       "target": "袁籜庵",
-      "relation": "studentOf"
+      "relation": "hasStudent"
     },
     {
       "source": "顧元方",
       "target": "school/漳海派",
+      "relation": "belongsToSchool"
+    },
+    {
+      "source": "程邃",
+      "target": "school/皖派",
+      "relation": "belongsToSchool"
+    },
+    {
+      "source": "金一甫",
+      "target": "何震",
+      "relation": "hasStudent"
+    },
+    {
+      "source": "金一甫",
+      "target": "school/莆田派",
+      "relation": "belongsToSchool"
+    },
+    {
+      "source": "文徵明",
+      "target": "文彭",
+      "relation": "hasTeacher"
+    },
+    {
+      "source": "文徵明",
+      "target": "school/吳門印派",
+      "relation": "belongsToSchool"
+    },
+    {
+      "source": "黃學",
+      "target": "school/吳門印派",
       "relation": "belongsToSchool"
     }
   ]

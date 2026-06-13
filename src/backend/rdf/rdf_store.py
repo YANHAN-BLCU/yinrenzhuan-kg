@@ -4,9 +4,13 @@ from typing import List, Dict, Optional, Any
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import NamespaceManager
 from rdflib.namespace import RDF, RDFS, OWL
-from .ontology import INK as INK_NS, get_person_uri
+from .ontology import INK as INK_NS, get_person_uri, get_school_uri, normalize_predicate
 
 logger = logging.getLogger(__name__)
+
+
+class RDFStore:
+    PERSON_TYPE = INK_NS.HistoricPerson
 
 
 class RDFStore:
@@ -23,9 +27,13 @@ class RDFStore:
         logger.info(f"Saved graph to {path}")
 
     def get_person_info(self, name: str) -> Dict[str, Any]:
-        info = {"person_name": name, "style_name": None, "hao": None,
-                "birth_year": None, "death_year": None, "native_place": None,
-                "dynasty": None, "schools": [], "relations": []}
+        info = {
+            "person_name": name, "style_name": None, "hao": None,
+            "birth_year": None, "death_year": None, "native_place": None,
+            "dynasty": None, "occupation": None, "official_rank": None,
+            "biography": None, "masterpiece": None, "style_description": None,
+            "schools": [], "relations": [],
+        }
 
         uri = get_person_uri(name)
         for p, o in self.graph.predicate_objects(uri):
@@ -44,12 +52,24 @@ class RDFStore:
                 info["native_place"] = str(o)
             elif p_local == "dynasty":
                 info["dynasty"] = str(o)
-            elif p_local in ("foundedSchool", "belongsToSchool"):
+            elif p_local == "occupation":
+                info["occupation"] = str(o)
+            elif p_local == "officialRank":
+                info["official_rank"] = str(o)
+            elif p_local == "biography":
+                info["biography"] = str(o)
+            elif p_local == "masterpiece":
+                info["masterpiece"] = str(o)
+            elif p_local == "styleDescription":
+                info["style_description"] = str(o)
+            elif p_local in ("foundedSchool", "belongsToSchool",
+                             "hasFounder", "hasMember"):
                 school_name = self._get_school_name(o)
                 if school_name and school_name not in info["schools"]:
                     info["schools"].append(school_name)
-            elif p_local in ("fatherOf", "sonOf", "teacherOf", "studentOf",
-                             "friendOf", "brotherOf", "inheritedFrom", "influencedBy"):
+            elif p_local in ("hasFather", "hasSon", "hasTeacher", "hasStudent",
+                             "hasFriend", "hasAncestor", "hasDescendant",
+                             "influencedBy", "inheritedFrom"):
                 target_name = self._get_person_name(o)
                 if target_name:
                     info["relations"].append({"type": p_local, "target": target_name})
@@ -90,7 +110,7 @@ class RDFStore:
     def get_all_persons(self) -> List[str]:
         persons = []
         seen = set()
-        for uri in self.graph.subjects(RDF.type, INK_NS.Person):
+        for uri in self.graph.subjects(RDF.type, INK_NS.HistoricPerson):
             for name_obj in self.graph.objects(uri, INK_NS.personName):
                 name = str(name_obj)
                 if name not in seen:
@@ -137,71 +157,63 @@ SELECT DISTINCT ?person ?name WHERE {{
         return None
 
     def as_networkx(self):
+        """Convert RDF graph to NetworkX DiGraph."""
         import networkx as nx
         G = nx.DiGraph()
-
         for s, p, o in self.graph:
             s_str, o_str = str(s), str(o)
             p_str = str(p)
-
             if "#" in p_str:
                 continue
-
             rel = p_str.split("/")[-1]
-
-            if rel in ("extractedBy", "source", "extractionMethod"):
+            if rel in ("extractedBy", "source", "extractionMethod",
+                       "confidence", "dataSource", "personName", "schoolName"):
                 continue
-
             ink_ns = str(INK_NS)
             if ink_ns not in s_str:
                 continue
-
             s_name = self._uri_to_name(s_str)
             o_name = self._uri_to_name(o_str)
             if s_name and o_name and s_name != o_name:
                 G.add_edge(s_name, o_name, relation=rel)
-
         return G
 
     def as_networkx_full(self):
-        """Return NetworkX graph with school/person node_type attribute."""
+        """Return NetworkX graph with node_type attribute (person/school/place/style)."""
         import networkx as nx
         G = nx.DiGraph()
-
         for s, p, o in self.graph:
             s_str, o_str = str(s), str(o)
             p_str = str(p)
-
             if "#" in p_str:
                 continue
-
             rel = p_str.split("/")[-1]
-
-            if rel in ("extractedBy", "source", "extractionMethod"):
+            if rel in ("extractedBy", "source", "extractionMethod",
+                       "confidence", "dataSource", "personName", "schoolName"):
                 continue
-
             ink_ns = str(INK_NS)
             if ink_ns not in s_str:
                 continue
-
             s_type = self._uri_to_node_type(s_str)
             o_type = self._uri_to_node_type(o_str)
             s_name = self._uri_to_name(s_str)
             o_name = self._uri_to_name(o_str)
-
             if s_name and o_name and s_name != o_name:
                 G.add_edge(s_name, o_name, relation=rel)
                 G.nodes[s_name]["node_type"] = s_type
                 G.nodes[o_name]["node_type"] = o_type
-
         return G
 
     def _uri_to_node_type(self, uri_str: str) -> str:
-        """Return 'school' or 'person' based on URI path segment."""
+        """Return node type based on URI path segment."""
         if "school/" in uri_str:
             return "school"
         if "person/" in uri_str:
             return "person"
         if "place/" in uri_str:
             return "place"
+        if "style/" in uri_str:
+            return "style"
+        if "era/" in uri_str:
+            return "era"
         return "unknown"

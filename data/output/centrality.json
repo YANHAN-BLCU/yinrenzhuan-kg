@@ -6,32 +6,32 @@
       "rank": 1
     },
     {
-      "name": "文彭",
+      "name": "school/吳門印派",
       "degree_centrality": 0.2632,
       "rank": 2
     },
     {
-      "name": "school/吳門印派",
+      "name": "文彭",
       "degree_centrality": 0.2632,
       "rank": 3
     },
     {
-      "name": "school/皖派",
+      "name": "蘇宣",
       "degree_centrality": 0.1579,
       "rank": 4
     },
     {
-      "name": "梁千秋",
+      "name": "school/皖派",
       "degree_centrality": 0.1579,
       "rank": 5
     },
     {
-      "name": "蘇宣",
+      "name": "梁千秋",
       "degree_centrality": 0.1579,
       "rank": 6
     },
     {
-      "name": "文徵明",
+      "name": "劉漁仲",
       "degree_centrality": 0.1053,
       "rank": 7
     },
@@ -46,7 +46,7 @@
       "rank": 9
     },
     {
-      "name": "劉漁仲",
+      "name": "文徵明",
       "degree_centrality": 0.1053,
       "rank": 10
     },
@@ -61,42 +61,42 @@
       "rank": 12
     },
     {
-      "name": "黃學",
+      "name": "張穉恭",
       "degree_centrality": 0.0526,
       "rank": 13
     },
     {
-      "name": "school/莆田派",
+      "name": "school/婁東派",
       "degree_centrality": 0.0526,
       "rank": 14
     },
     {
-      "name": "張穉恭",
+      "name": "萬年少",
       "degree_centrality": 0.0526,
       "rank": 15
     },
     {
-      "name": "school/婁東派",
+      "name": "袁籜庵",
       "degree_centrality": 0.0526,
       "rank": 16
     },
     {
-      "name": "萬年少",
+      "name": "顧元方",
       "degree_centrality": 0.0526,
       "rank": 17
     },
     {
-      "name": "袁籜庵",
+      "name": "school/漳海派",
       "degree_centrality": 0.0526,
       "rank": 18
     },
     {
-      "name": "顧元方",
+      "name": "school/莆田派",
       "degree_centrality": 0.0526,
       "rank": 19
     },
     {
-      "name": "school/漳海派",
+      "name": "黃學",
       "degree_centrality": 0.0526,
       "rank": 20
     }
@@ -118,87 +118,87 @@
       "rank": 3
     },
     {
-      "name": "文徵明",
+      "name": "school/皖派",
       "betweenness_centrality": 0.0,
       "rank": 4
     },
     {
-      "name": "school/吳門印派",
+      "name": "丁敬",
       "betweenness_centrality": 0.0,
       "rank": 5
     },
     {
-      "name": "程邃",
+      "name": "school/浙派",
       "betweenness_centrality": 0.0,
       "rank": 6
     },
     {
-      "name": "school/皖派",
+      "name": "張穉恭",
       "betweenness_centrality": 0.0,
       "rank": 7
     },
     {
-      "name": "梁千秋",
+      "name": "school/婁東派",
       "betweenness_centrality": 0.0,
       "rank": 8
     },
     {
-      "name": "丁敬",
+      "name": "梁千秋",
       "betweenness_centrality": 0.0,
       "rank": 9
     },
     {
-      "name": "school/浙派",
+      "name": "school/吳門印派",
       "betweenness_centrality": 0.0,
       "rank": 10
     },
     {
-      "name": "金一甫",
+      "name": "劉漁仲",
       "betweenness_centrality": 0.0,
       "rank": 11
     },
     {
-      "name": "黃學",
+      "name": "萬年少",
       "betweenness_centrality": 0.0,
       "rank": 12
     },
     {
-      "name": "school/莆田派",
+      "name": "袁籜庵",
       "betweenness_centrality": 0.0,
       "rank": 13
     },
     {
-      "name": "張穉恭",
+      "name": "顧元方",
       "betweenness_centrality": 0.0,
       "rank": 14
     },
     {
-      "name": "school/婁東派",
+      "name": "school/漳海派",
       "betweenness_centrality": 0.0,
       "rank": 15
     },
     {
-      "name": "劉漁仲",
+      "name": "程邃",
       "betweenness_centrality": 0.0,
       "rank": 16
     },
     {
-      "name": "萬年少",
+      "name": "金一甫",
       "betweenness_centrality": 0.0,
       "rank": 17
     },
     {
-      "name": "袁籜庵",
+      "name": "文徵明",
       "betweenness_centrality": 0.0,
       "rank": 18
     },
     {
-      "name": "顧元方",
+      "name": "school/莆田派",
       "betweenness_centrality": 0.0,
       "rank": 19
     },
     {
-      "name": "school/漳海派",
+      "name": "黃學",
       "betweenness_centrality": 0.0,
       "rank": 20
     }
@@ -245,12 +245,12 @@
       "rank": 8
     },
     {
-      "name": "梁千秋",
+      "name": "蘇宣",
       "pagerank": 0.0474,
       "rank": 9
     },
     {
-      "name": "蘇宣",
+      "name": "梁千秋",
       "pagerank": 0.0474,
       "rank": 10
     },
@@ -265,42 +265,42 @@
       "rank": 12
     },
     {
-      "name": "文徵明",
+      "name": "丁敬",
       "pagerank": 0.0276,
       "rank": 13
     },
     {
-      "name": "丁敬",
+      "name": "張穉恭",
       "pagerank": 0.0276,
       "rank": 14
     },
     {
-      "name": "金一甫",
+      "name": "劉漁仲",
       "pagerank": 0.0276,
       "rank": 15
     },
     {
-      "name": "黃學",
+      "name": "萬年少",
       "pagerank": 0.0276,
       "rank": 16
     },
     {
-      "name": "張穉恭",
+      "name": "顧元方",
       "pagerank": 0.0276,
       "rank": 17
     },
     {
-      "name": "劉漁仲",
+      "name": "金一甫",
       "pagerank": 0.0276,
       "rank": 18
     },
     {
-      "name": "萬年少",
+      "name": "文徵明",
       "pagerank": 0.0276,
       "rank": 19
     },
     {
-      "name": "顧元方",
+      "name": "黃學",
       "pagerank": 0.0276,
       "rank": 20
     }
@@ -337,72 +337,72 @@
       "rank": 6
     },
     {
-      "name": "程邃",
+      "name": "school/浙派",
       "closeness_centrality": 0.0526,
       "rank": 7
     },
     {
-      "name": "school/浙派",
+      "name": "school/婁東派",
       "closeness_centrality": 0.0526,
       "rank": 8
     },
     {
-      "name": "school/莆田派",
+      "name": "袁籜庵",
       "closeness_centrality": 0.0526,
       "rank": 9
     },
     {
-      "name": "school/婁東派",
+      "name": "school/漳海派",
       "closeness_centrality": 0.0526,
       "rank": 10
     },
     {
-      "name": "袁籜庵",
+      "name": "程邃",
       "closeness_centrality": 0.0526,
       "rank": 11
     },
     {
-      "name": "school/漳海派",
+      "name": "school/莆田派",
       "closeness_centrality": 0.0526,
       "rank": 12
     },
     {
-      "name": "文徵明",
+      "name": "丁敬",
       "closeness_centrality": 0.0,
       "rank": 13
     },
     {
-      "name": "丁敬",
+      "name": "張穉恭",
       "closeness_centrality": 0.0,
       "rank": 14
     },
     {
-      "name": "金一甫",
+      "name": "劉漁仲",
       "closeness_centrality": 0.0,
       "rank": 15
     },
     {
-      "name": "黃學",
+      "name": "萬年少",
       "closeness_centrality": 0.0,
       "rank": 16
     },
     {
-      "name": "張穉恭",
+      "name": "顧元方",
       "closeness_centrality": 0.0,
       "rank": 17
     },
     {
-      "name": "劉漁仲",
+      "name": "金一甫",
       "closeness_centrality": 0.0,
       "rank": 18
     },
     {
-      "name": "萬年少",
+      "name": "文徵明",
       "closeness_centrality": 0.0,
       "rank": 19
     },
     {
-      "name": "顧元方",
+      "name": "黃學",
       "closeness_centrality": 0.0,
       "rank": 20
     }

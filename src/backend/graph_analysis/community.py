@@ -43,7 +43,7 @@ class CommunityDetection:
                 if member in self.graph:
                     for _, _, data in self.graph.out_edges(member, data=True):
                         school = data.get("relation", "")
-                        if "School" in school or "派" in school:
+                        if any(kw in school for kw in ["School", "派", "Founder", "Member", "founder", "member"]):
                             schools[school] = schools.get(school, 0) + 1
 
             self.communities[f"community_{comm_id}"] = {

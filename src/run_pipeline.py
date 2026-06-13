@@ -249,10 +249,15 @@ def run_pipeline(
         persons_to_link = list(person_set)[:30]
         for name in persons_to_link:
             person_triples = [t for t in all_triples if t["subject"] == name]
-            style_name = next((t["object"] for t in person_triples if t["predicate"] == "styleName"), None)
-            hao = next((t["object"] for t in person_triples if t["predicate"] == "hao"), None)
-            dynasty = next((t["object"] for t in person_triples if t["predicate"] == "dynasty"), None)
-            merger.merge_external_knowledge(name, style_name, hao, dynasty)
+            style_name = next((t["object"] for t in person_triples
+                              if t["predicate"] in ("styleName", "attribute:hasStyleName")), None)
+            hao = next((t["object"] for t in person_triples
+                       if t["predicate"] in ("hao", "attribute:hasHao")), None)
+            dynasty = next((t["object"] for t in person_triples
+                          if t["predicate"] in ("dynasty", "attribute:dynasty")), None)
+            native_place = next((t["object"] for t in person_triples
+                               if t["predicate"] in ("nativePlace", "attribute:nativePlace")), None)
+            merger.merge_external_knowledge(name, style_name, hao, dynasty, native_place)
 
         rdf_store.save(LINKED_OUTPUT)
         logger.info(f"Linked graph saved: {LINKED_OUTPUT}")

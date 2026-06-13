@@ -3,61 +3,95 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-ex:Artifact a owl:Class ;
+ex:Place a owl:Class ;
     rdfs:subClassOf ex:Thing .
 
 ex:RDF owl:Ontology ex:ontology .
+
+ex:Style a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:TimePeriod a owl:Class ;
+    rdfs:subClassOf ex:Thing .
 
 ex:Work a owl:Class ;
     rdfs:subClassOf ex:Thing .
 
 ex:appellation a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
 
 ex:belongsToSchool a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:School .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:SealEngravingSchool .
+
+ex:biography a owl:DatatypeProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range xsd:string .
 
 ex:birthYear a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:integer .
 
 ex:birthYearString a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
 
 ex:brotherOf a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
 
 ex:cbdbId a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:string .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Thing .
+
+ex:cbdbReference a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Thing .
 
 ex:confidence a owl:DatatypeProperty ;
-    rdfs:domain ex:Thing ;
+    rdfs:domain ex:Evidence ;
     rdfs:range xsd:float .
 
+ex:createdWork a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:SealWork .
+
+ex:creationPeriod a owl:DatatypeProperty ;
+    rdfs:domain ex:SealWork ;
+    rdfs:range xsd:string .
+
 ex:ctextId a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:string .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Thing .
+
+ex:ctextReference a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Thing .
 
 ex:dataSource a owl:DatatypeProperty ;
     rdfs:domain ex:Thing ;
     rdfs:range xsd:string .
 
 ex:deathYear a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:integer .
 
 ex:deathYearString a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range xsd:string .
+
+ex:description a owl:DatatypeProperty ;
+    rdfs:domain ex:SealEngravingSchool ;
     rdfs:range xsd:string .
 
 ex:dynasty a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
+
+ex:endYear a owl:DatatypeProperty ;
+    rdfs:domain ex:Era ;
+    rdfs:range xsd:integer .
 
 <http://example.org/inkperson/evidence/丁敬_foundedSchool> a ex:Evidence ;
     ex:confidence "0.95"^^xsd:float ;
@@ -354,79 +388,137 @@ ex:dynasty a owl:DatatypeProperty ;
 
 ex:extractedBy a owl:ObjectProperty ;
     rdfs:domain ex:Evidence ;
-    rdfs:range ex:Person .
+    rdfs:range ex:HistoricPerson .
 
 ex:extractionMethod a owl:DatatypeProperty ;
     rdfs:domain ex:Evidence ;
     rdfs:range xsd:string .
 
 ex:fatherOf a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person ;
-    owl:inverseOf ex:sonOf .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
 
 ex:foundedSchool a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:School .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:SealEngravingSchool .
 
-ex:friendOf a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person .
-
-ex:fromPlace a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Place .
-
-ex:hao a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+ex:founder a owl:DatatypeProperty ;
+    rdfs:domain ex:SealEngravingSchool ;
     rdfs:range xsd:string .
 
+ex:friendOf a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+ex:fromPlace a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Location .
+
+ex:hao a owl:DatatypeProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range xsd:string .
+
+ex:hasAncestor a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+ex:hasCalligraphyStyle a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:CalligraphyStyle .
+
+ex:hasDescendant a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+ex:hasFather a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson ;
+    owl:inverseOf ex:hasSon .
+
+ex:hasFounder a owl:ObjectProperty ;
+    rdfs:domain ex:SealEngravingSchool ;
+    rdfs:range ex:HistoricPerson ;
+    owl:inverseOf ex:hasMember .
+
+ex:hasFriend a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
 ex:hasPeriod a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:TimePeriod .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Era .
 
 ex:hasStyle a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Style .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:CalligraphyStyle .
+
+ex:hasTeacher a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson ;
+    owl:inverseOf ex:hasStudent .
 
 ex:influencedBy a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
 
 ex:inheritedFrom a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+ex:inheritsFrom a owl:ObjectProperty ;
+    rdfs:domain ex:SealEngravingSchool ;
+    rdfs:range ex:SealEngravingSchool .
+
+ex:livedInPeriod a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Era .
+
+ex:locatedIn a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:Location .
+
+ex:masterpiece a owl:DatatypeProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range xsd:string .
+
+ex:material a owl:DatatypeProperty ;
+    rdfs:domain ex:SealWork ;
+    rdfs:range xsd:string .
 
 ex:nativePlace a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
 
 ex:occupation a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
 
 ex:officialRank a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
 
 ex:period a owl:DatatypeProperty ;
-    rdfs:domain ex:School ;
+    rdfs:domain ex:SealEngravingSchool ;
     rdfs:range xsd:string .
 
 ex:periodName a owl:DatatypeProperty ;
-    rdfs:domain ex:TimePeriod ;
+    rdfs:domain ex:Era ;
     rdfs:range xsd:string .
 
 ex:personName a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:HistoricPerson ;
     rdfs:range xsd:string .
 
 ex:placeName a owl:DatatypeProperty ;
-    rdfs:domain ex:Place ;
+    rdfs:domain ex:Location ;
+    rdfs:range xsd:string .
+
+ex:placeType a owl:DatatypeProperty ;
+    rdfs:domain ex:Location ;
     rdfs:range xsd:string .
 
 ex:region a owl:DatatypeProperty ;
-    rdfs:domain ex:School ;
+    rdfs:domain ex:SealEngravingSchool ;
     rdfs:range xsd:string .
 
 ex:sameAs a owl:ObjectProperty ;
@@ -434,8 +526,12 @@ ex:sameAs a owl:ObjectProperty ;
     rdfs:range ex:Thing .
 
 ex:schoolName a owl:DatatypeProperty ;
-    rdfs:domain ex:School ;
+    rdfs:domain ex:SealEngravingSchool ;
     rdfs:range xsd:string .
+
+ex:sonOf a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
 
 ex:source a owl:ObjectProperty ;
     rdfs:domain ex:Evidence ;
@@ -445,163 +541,187 @@ ex:sourceText a owl:DatatypeProperty ;
     rdfs:domain ex:Evidence ;
     rdfs:range xsd:string .
 
+ex:startYear a owl:DatatypeProperty ;
+    rdfs:domain ex:Era ;
+    rdfs:range xsd:integer .
+
+ex:studentOf a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+ex:styleDescription a owl:DatatypeProperty ;
+    rdfs:domain ex:CalligraphyStyle ;
+    rdfs:range xsd:string .
+
 ex:styleName a owl:DatatypeProperty ;
-    rdfs:domain ex:Person ;
+    rdfs:domain ex:CalligraphyStyle ;
     rdfs:range xsd:string .
 
 ex:teacherOf a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person ;
-    owl:inverseOf ex:studentOf .
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
 
-ex:Style a owl:Class ;
-    rdfs:subClassOf ex:Thing .
+ex:workTitle a owl:DatatypeProperty ;
+    rdfs:domain ex:SealWork ;
+    rdfs:range xsd:string .
 
-<http://example.org/inkperson/person/李根> a ex:Person ;
+ex:hasMember a owl:ObjectProperty ;
+    rdfs:domain ex:SealEngravingSchool ;
+    rdfs:range ex:HistoricPerson .
+
+ex:hasSon a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+ex:hasStudent a owl:ObjectProperty ;
+    rdfs:domain ex:HistoricPerson ;
+    rdfs:range ex:HistoricPerson .
+
+<http://example.org/inkperson/person/李根> a ex:HistoricPerson ;
     ex:personName "李根" ;
     ex:styleName "居士" .
 
-<http://example.org/inkperson/person/莆田派> a ex:Person ;
+<http://example.org/inkperson/person/莆田派> a ex:HistoricPerson ;
     ex:founder "宋比玉" ;
     ex:personName "莆田派" .
 
-<http://example.org/inkperson/person/袁籜庵> a ex:Person ;
+<http://example.org/inkperson/person/袁籜庵> a ex:HistoricPerson ;
     ex:personName "袁籜庵" .
 
-<http://example.org/inkperson/person/錢陸燦> a ex:Person ;
+<http://example.org/inkperson/person/錢陸燦> a ex:HistoricPerson ;
     ex:authorOf "印人傳序" ;
     ex:personName "錢陸燦" .
 
-<http://example.org/inkperson/person/顧築公> a ex:Person ;
+<http://example.org/inkperson/person/顧築公> a ex:HistoricPerson ;
     ex:personName "顧築公" ;
     ex:styleName "墣" .
 
-<http://example.org/inkperson/school/婁東派> a ex:School ;
+<http://example.org/inkperson/school/婁東派> a ex:SealEngravingSchool ;
     ex:schoolName "婁東派" .
 
-<http://example.org/inkperson/school/浙派> a ex:School ;
+<http://example.org/inkperson/school/浙派> a ex:SealEngravingSchool ;
     ex:schoolName "浙派" .
 
-<http://example.org/inkperson/school/漳海派> a ex:School ;
+<http://example.org/inkperson/school/漳海派> a ex:SealEngravingSchool ;
     ex:schoolName "漳海派" .
 
-<http://example.org/inkperson/school/莆田派> a ex:School ;
+<http://example.org/inkperson/school/莆田派> a ex:SealEngravingSchool ;
     ex:schoolName "莆田派" .
 
-ex:sonOf a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person .
-
-ex:studentOf a owl:ObjectProperty ;
-    rdfs:domain ex:Person ;
-    rdfs:range ex:Person .
-
-ex:Place a owl:Class ;
-    rdfs:subClassOf ex:Thing .
-
-ex:TimePeriod a owl:Class ;
-    rdfs:subClassOf ex:Thing .
-
-<http://example.org/inkperson/person/劉漁仲> a ex:Person ;
+<http://example.org/inkperson/person/劉漁仲> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/皖派> ;
-    ex:personName "劉漁仲" ;
-    ex:studentOf <http://example.org/inkperson/person/程邃> .
+    ex:hasStudent <http://example.org/inkperson/person/程邃> ;
+    ex:personName "劉漁仲" .
 
-<http://example.org/inkperson/person/周亮工> a ex:Person ;
+<http://example.org/inkperson/person/周亮工> a ex:HistoricPerson ;
     ex:appellation "周亮工" ;
     ex:authorOf "印人傳" ;
     ex:personName "周亮工" .
 
-<http://example.org/inkperson/person/張穉恭> a ex:Person ;
+<http://example.org/inkperson/person/張穉恭> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/婁東派> ;
     ex:nativePlace "婁東人" ;
     ex:personName "張穉恭" .
 
-<http://example.org/inkperson/person/文徵明> a ex:Person ;
+<http://example.org/inkperson/person/文徵明> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
-    ex:personName "文徵明" ;
-    ex:teacherOf <http://example.org/inkperson/person/文彭> .
+    ex:hasTeacher <http://example.org/inkperson/person/文彭> ;
+    ex:personName "文徵明" .
 
-<http://example.org/inkperson/person/顧元方> a ex:Person ;
+<http://example.org/inkperson/person/顧元方> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/漳海派> ;
     ex:nativePlace "婺源人" ;
     ex:personName "顧元方" .
 
-<http://example.org/inkperson/person/丁敬> a ex:Person ;
-    ex:foundedSchool <http://example.org/inkperson/school/浙派> ;
+<http://example.org/inkperson/person/丁敬> a ex:HistoricPerson ;
+    ex:hasFounder <http://example.org/inkperson/school/浙派> ;
     ex:nativePlace "錢塘人" ;
     ex:personName "丁敬" ;
     ex:styleName "敬身" .
 
-<http://example.org/inkperson/person/萬年少> a ex:Person ;
+<http://example.org/inkperson/person/萬年少> a ex:HistoricPerson ;
     ex:hao "若" ;
+    ex:hasStudent <http://example.org/inkperson/person/袁籜庵> ;
     ex:personName "萬年少" ;
-    ex:studentOf <http://example.org/inkperson/person/袁籜庵> ;
     ex:styleName "壽祺" .
 
-<http://example.org/inkperson/person/黃學> a ex:Person ;
+<http://example.org/inkperson/person/黃學> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
     ex:nativePlace "如皋人" ;
     ex:personName "黃學" ;
     ex:styleName "經",
         "黃學" .
 
-<http://example.org/inkperson/school/皖派> a ex:School ;
+<http://example.org/inkperson/school/皖派> a ex:SealEngravingSchool ;
     ex:schoolName "皖派" .
 
-<http://example.org/inkperson/person/梁千秋> a ex:Person ;
-    ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
-    ex:nativePlace "維揚人" ;
-    ex:personName "梁千秋" ;
-    ex:studentOf <http://example.org/inkperson/person/何震> .
+ex:CalligraphyStyle a owl:Class ;
+    rdfs:subClassOf ex:Thing .
 
-<http://example.org/inkperson/person/程邃> a ex:Person ;
+ex:Location a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:SealWork a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+<http://example.org/inkperson/person/梁千秋> a ex:HistoricPerson ;
+    ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:hasStudent <http://example.org/inkperson/person/何震> ;
+    ex:nativePlace "維揚人" ;
+    ex:personName "梁千秋" .
+
+<http://example.org/inkperson/person/程邃> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/皖派> ;
     ex:nativePlace "休寧人" ;
     ex:personName "程邃" ;
     ex:styleName "程邃" .
 
-<http://example.org/inkperson/person/金一甫> a ex:Person ;
+<http://example.org/inkperson/person/金一甫> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/莆田派> ;
     ex:hao "一甫" ;
+    ex:hasStudent <http://example.org/inkperson/person/何震> ;
     ex:nativePlace "休寧人" ;
-    ex:personName "金一甫" ;
-    ex:studentOf <http://example.org/inkperson/person/何震> .
+    ex:personName "金一甫" .
 
-<http://example.org/inkperson/person/蘇宣> a ex:Person ;
+ex:Era a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+<http://example.org/inkperson/person/蘇宣> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/皖派> ;
+    ex:hasStudent <http://example.org/inkperson/person/文彭> ;
     ex:nativePlace "儀真人" ;
     ex:personName "蘇宣" ;
-    ex:studentOf <http://example.org/inkperson/person/文彭> ;
     ex:styleName "蘇宣" .
 
-<http://example.org/inkperson/school/吳門印派> a ex:School ;
+<http://example.org/inkperson/school/吳門印派> a ex:SealEngravingSchool ;
     ex:schoolName "吳門印派" .
 
-<http://example.org/inkperson/person/文彭> a ex:Person ;
+<http://example.org/inkperson/person/文彭> a ex:HistoricPerson ;
     ex:appellation "國博" ;
-    ex:foundedSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:hasFounder <http://example.org/inkperson/school/吳門印派> ;
+    ex:hasTeacher <http://example.org/inkperson/person/何震> ;
     ex:nativePlace "蘇州人" ;
     ex:personName "文彭" ;
-    ex:styleName "壽承" ;
-    ex:teacherOf <http://example.org/inkperson/person/何震> .
+    ex:styleName "壽承" .
 
-<http://example.org/inkperson/person/何震> a ex:Person ;
+<http://example.org/inkperson/person/何震> a ex:HistoricPerson ;
     ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
     ex:hao "何震" ;
+    ex:hasStudent <http://example.org/inkperson/person/文彭> ;
+    ex:hasTeacher <http://example.org/inkperson/person/梁千秋>,
+        <http://example.org/inkperson/person/蘇宣> ;
     ex:nativePlace "婺源人" ;
     ex:personName "何震" ;
-    ex:studentOf <http://example.org/inkperson/person/文彭> ;
-    ex:styleName "長卿" ;
-    ex:teacherOf <http://example.org/inkperson/person/梁千秋>,
-        <http://example.org/inkperson/person/蘇宣> .
+    ex:styleName "長卿" .
 
-ex:School a owl:Class ;
+ex:SealEngravingSchool a owl:Class ;
     rdfs:subClassOf ex:Thing .
+
+ex:Thing a owl:Class .
 
 ex:Evidence a owl:Class ;
     rdfs:subClassOf ex:Thing .
 
-ex:Person a owl:Class ;
+ex:HistoricPerson a owl:Class ;
     rdfs:subClassOf ex:Thing .
 
