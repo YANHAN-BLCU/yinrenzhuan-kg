@@ -1,10 +1,32 @@
+"""
+基于 LangGraph 的可控问答工作流。
+
+节点序列：
+  parse_intent → decide_route
+                        ├→ synthesize_answer (opinion / unknown 路径)
+                        └→ generate_sparql → execute_query → verify_result
+                                                               ├→ synthesize_answer (验证通过)
+                                                               └→ handle_error (验证失败：SPARQL错误/无结果)
+
+条件边（conditional_edges）：
+  decide_route:
+    - opinion / unknown → END
+    - generate_sparql
+  verify_result:
+    - valid (有结果) → synthesize_answer
+    - invalid (无结果/SPARQL错误) → handle_error
+"""
 import logging
-from typing import Optional
-from .state import QAState
+from typing import Literal
+from .state import QAState, ErrorType
 from .nodes import (
-    parse_intent_node, decide_tool_or_sparql_node,
-    call_local_tools_node, generate_sparql_node,
-    execute_sparql_node, generate_answer_node, fallback_answer_node,
+    parse_intent,
+    decide_route,
+    generate_sparql,
+    execute_query,
+    verify_result,
+    synthesize_answer,
+    handle_error,
 )
 from .tools import QATools
 from .sparql_generator import SPARQLGenerator
@@ -12,99 +34,240 @@ from .sparql_generator import SPARQLGenerator
 logger = logging.getLogger(__name__)
 
 
-def build_qa_workflow(rdf_store, rag_retriever=None, llm_client=None):
+def build_langgraph_workflow(
+    rdf_store,
+    use_llm_sparql: bool = False,
+    use_llm_fallback: bool = True,
+) -> "CompiledStateGraph":
+    """
+    构建 LangGraph 工作流图。
+
+    Args:
+        rdf_store: RDFStore 实例
+        use_llm_sparql: 是否使用 LLM 生成 SPARQL（需 Ollama）
+        use_llm_fallback: 是否使用 LLM 生成兜底答案
+
+    Returns:
+        编译后的 LangGraph StateGraph
+    """
     try:
-        from langgraph.graph import StateGraph, END
-        has_langgraph = True
+        from langgraph.graph import StateGraph, END, START
+        from langgraph.checkpoint.memory import MemorySaver
     except ImportError:
-        has_langgraph = False
+        logger.warning("langgraph not installed, using fallback workflow")
+        return None
 
     tools = QATools(rdf_store)
-    sparql_gen = SPARQLGenerator(llm_client)
+    sparql_gen = SPARQLGenerator(use_llm=use_llm_sparql)
+    llm_client = _LLMClient(use_llm_fallback) if use_llm_fallback else None
 
-    def run_workflow(question: str) -> QAState:
-        state: QAState = {
-            "question": question,
-            "intent": "unknown",
-            "entities": [],
-            "can_use_tools": False,
-            "tool_result": None,
-            "sparql_generated": "",
-            "sparql_executed": False,
-            "sparql_result": None,
-            "answer": "",
-            "fallback_used": False,
-            "rag_retrieved": None,
-            "rag_used": False,
-        }
+    # --- 定义节点函数（绑定工具） ---
+    def _parse_intent(s: QAState) -> QAState:
+        return parse_intent(s)
 
-        state = parse_intent_node(state)
-        state = decide_tool_or_sparql_node(state, tools)
+    def _decide_route(s: QAState) -> QAState:
+        return decide_route(s)
 
-        if state["can_use_tools"]:
-            state = call_local_tools_node(state, tools)
-            state = generate_answer_node(state)
-            return state
-        else:
-            state = generate_sparql_node(state, sparql_gen)
-            if state.get("sparql_generated"):
-                state = execute_sparql_node(state, tools)
-                if state.get("sparql_executed"):
-                    state = generate_answer_node(state)
-                    return state
+    def _generate_sparql(s: QAState) -> QAState:
+        return generate_sparql(s, sparql_gen)
 
-            if rag_retriever:
-                try:
-                    chunks = rag_retriever.retrieve(question, top_k=3)
-                    if chunks:
-                        state["rag_retrieved"] = {"chunks": chunks}
-                        state["rag_used"] = True
-                except Exception as e:
-                    logger.warning(f"RAG retrieval failed: {e}")
+    def _execute_query(s: QAState) -> QAState:
+        return execute_query(s, tools)
 
-            state = fallback_answer_node(state)
-            return state
+    def _verify_result(s: QAState) -> QAState:
+        return verify_result(s)
 
-    if has_langgraph:
-        def build_graph():
-            builder = StateGraph(QAState)
-            builder.add_node("parse_intent", lambda s: parse_intent_node(s))
-            builder.add_node("decide", lambda s: decide_tool_or_sparql_node(s, tools))
-            builder.add_node("tools", lambda s: call_local_tools_node(s, tools))
-            builder.add_node("gen_sparql", lambda s: generate_sparql_node(s, sparql_gen))
-            builder.add_node("exec_sparql", lambda s: execute_sparql_node(s, tools))
-            builder.add_node("gen_answer", lambda s: generate_answer_node(s))
-            builder.add_node("fallback", lambda s: fallback_answer_node(s))
+    def _synthesize(s: QAState) -> QAState:
+        return synthesize_answer(s)
 
-            builder.set_entry_point("parse_intent")
-            builder.add_edge("parse_intent", "decide")
+    def _handle_error(s: QAState) -> QAState:
+        return handle_error(s, llm_client)
 
-            def route_decide(state: QAState) -> str:
-                if state.get("can_use_tools", False):
-                    return "tools"
-                return "gen_sparql"
+    # --- 构建图 ---
+    builder = StateGraph(QAState)
 
-            builder.add_conditional_edges("decide", route_decide, {
-                "tools": "tools",
-                "gen_sparql": "gen_sparql",
-            })
-            builder.add_edge("tools", "gen_answer")
-            builder.add_edge("gen_sparql", "exec_sparql")
+    # 添加节点
+    builder.add_node("parse_intent", _parse_intent)
+    builder.add_node("decide_route", _decide_route)
+    builder.add_node("generate_sparql", _generate_sparql)
+    builder.add_node("execute_query", _execute_query)
+    builder.add_node("verify_result", _verify_result)
+    builder.add_node("synthesize_answer", _synthesize)
+    builder.add_node("handle_error", _handle_error)
 
-            def route_exec(state: QAState) -> str:
-                if state.get("sparql_executed", False):
-                    return "gen_answer"
-                return "fallback"
+    # 设置入口
+    builder.add_edge(START, "parse_intent")
 
-            builder.add_conditional_edges("exec_sparql", route_exec, {
-                "gen_answer": "gen_answer",
-                "fallback": "fallback",
-            })
-            builder.add_edge("gen_answer", END)
-            builder.add_edge("fallback", END)
-            return builder.compile()
+    # parse_intent → decide_route
+    builder.add_edge("parse_intent", "decide_route")
 
-        graph = build_graph()
+    # decide_route → 条件分支
+    def route_decide(s: QAState) -> Literal["synthesize_answer", "generate_sparql", "__end__"]:
+        """
+        路由决策：
+        - opinion / unknown 意图 → 直接合成答案
+        - needs_kg_query=False → 异常处理
+        - 其他 → SPARQL 生成
+        """
+        intent = s.get("intent", "")
+        needs_kg = s.get("needs_kg_query", False)
+
+        if intent in ("opinion", "unknown"):
+            return "synthesize_answer"
+        if not needs_kg:
+            return "handle_error"
+        return "generate_sparql"
+
+    builder.add_conditional_edges(
+        "decide_route",
+        route_decide,
+        {
+            "synthesize_answer": "synthesize_answer",
+            "generate_sparql": "generate_sparql",
+            "handle_error": "handle_error",
+        },
+    )
+
+    # generate_sparql → execute_query
+    builder.add_edge("generate_sparql", "execute_query")
+
+    # execute_query → verify_result
+    builder.add_edge("execute_query", "verify_result")
+
+    # verify_result → 条件分支
+    def route_verify(s: QAState) -> Literal["synthesize_answer", "handle_error"]:
+        """
+        验证结果路由：
+        - valid（有结果） → 合成答案
+        - invalid（无结果/SPARQL错误） → 异常处理
+        """
+        verification = s.get("verification")
+        error_type = s.get("error_type", ErrorType.NONE)
+
+        if verification and verification.is_valid and verification.row_count > 0:
+            return "synthesize_answer"
+
+        # 执行成功但结果为空，或有执行错误 → 异常处理
+        return "handle_error"
+
+    builder.add_conditional_edges(
+        "verify_result",
+        route_verify,
+        {
+            "synthesize_answer": "synthesize_answer",
+            "handle_error": "handle_error",
+        },
+    )
+
+    # 所有终点 → END
+    builder.add_edge("synthesize_answer", END)
+    builder.add_edge("handle_error", END)
+
+    # 编译图
+    graph = builder.compile(checkpointer=MemorySaver())
+    logger.info("LangGraph workflow compiled successfully")
+    return graph
+
+
+def run_workflow_simple(
+    rdf_store,
+    question: str,
+    use_llm_sparql: bool = False,
+    use_llm_fallback: bool = True,
+) -> QAState:
+    """
+    非 LangGraph 回退工作流（直接顺序调用）。
+
+    当 langgraph 不可用时，使用此函数。
+    """
+    tools = QATools(rdf_store)
+    sparql_gen = SPARQLGenerator(use_llm=use_llm_sparql)
+    llm_client = _LLMClient(use_llm_fallback) if use_llm_fallback else None
+
+    state: QAState = {
+        "question": question,
+        "parsed_entities": [],
+        "intent": "unknown",
+        "needs_kg_query": False,
+        "skip_reason": "",
+        "sparql": "",
+        "sparql_error": "",
+        "sparql_generation_method": "rule",
+        "query_result": None,
+        "verification": None,
+        "tool_calls": [],
+        "current_tool": "",
+        "answer": "",
+        "answer_source": "",
+        "error_type": ErrorType.NONE,
+        "error_message": "",
+        "handled": False,
+    }
+
+    # 节点1-2
+    state = parse_intent(state)
+    state = decide_route(state)
+
+    intent = state.get("intent", "")
+    needs_kg = state.get("needs_kg_query", False)
+
+    if intent in ("opinion", "unknown") or not needs_kg:
+        state = synthesize_answer(state)
+        return state
+
+    # 节点3-4-5-6-7
+    state = generate_sparql(state, sparql_gen)
+    state = execute_query(state, tools)
+    state = verify_result(state)
+
+    verification = state.get("verification")
+    error_type = state.get("error_type", ErrorType.NONE)
+
+    if verification and verification.is_valid and verification.row_count > 0:
+        state = synthesize_answer(state)
+    else:
+        state = handle_error(state, llm_client)
+
+    return state
+
+
+def build_qa_workflow(rdf_store):
+    """兼容旧 API：返回工作流对象（LangGraph graph 或简单函数）。"""
+    graph = build_langgraph_workflow(rdf_store)
+    if graph is not None:
         return graph
 
-    return run_workflow
+    def _run(question: str) -> "QAState":
+        return run_workflow_simple(rdf_store, question)
+
+    return _run
+
+
+class _LLMClient:
+    """LLM 调用包装器（用于人设回答）。"""
+
+    def __init__(self, enabled: bool = True):
+        self.enabled = enabled
+
+    def generate(self, prompt: str, system: str = "") -> str:
+        if not self.enabled:
+            return ""
+        try:
+            import httpx
+            from ..utils.config import OLLAMA_BASE_URL, OLLAMA_MODEL
+            with httpx.Client(timeout=30.0) as client:
+                resp = client.post(
+                    f"{OLLAMA_BASE_URL}/api/generate",
+                    json={
+                        "model": OLLAMA_MODEL,
+                        "prompt": prompt,
+                        "system": system,
+                        "stream": False,
+                        "options": {"num_predict": 512, "temperature": 0.3},
+                    },
+                )
+                if resp.status_code == 200:
+                    return resp.json().get("response", "")
+        except Exception:
+            pass
+        return ""

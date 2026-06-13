@@ -122,12 +122,13 @@ def qa(req: QARequest):
             "question": req.question,
             "answer": result.get("answer", ""),
             "intent": result.get("intent", ""),
-            "entities": result.get("entities", []),
-            "tool_used": result.get("can_use_tools", False),
-            "sparql": result.get("sparql_generated", ""),
-            "fallback_used": result.get("fallback_used", False),
-            "tool_result": result.get("tool_result"),
-            "sparql_result": result.get("sparql_result"),
+            "entities": result.get("parsed_entities", []),
+            "needs_kg_query": result.get("needs_kg_query", False),
+            "sparql": result.get("sparql", ""),
+            "answer_source": result.get("answer_source", ""),
+            "error_type": result.get("error_type", ""),
+            "query_result": result.get("query_result"),
+            "verification": result.get("verification"),
         }
     except Exception as e:
         logger.error(f"QA error: {e}")
@@ -241,13 +242,11 @@ def _mount_frontend():
             return FileResponse(str(index_path))
         logger.info(f"Frontend mounted at / -> {index_path}")
 
-        # Serve index_card/ images at /index_card/...
         card_dir = project_root / "index_card"
         if card_dir.exists():
             app.mount("/index_card", StaticFiles(directory=str(card_dir)), name="index_card")
             logger.info(f"Mounted index_card/ at /index_card/")
 
-        # Serve data/output/ at /data/... (for any future static assets)
         data_dir = project_root / "data"
         if data_dir.exists():
             app.mount("/data", StaticFiles(directory=str(data_dir)), name="data")
