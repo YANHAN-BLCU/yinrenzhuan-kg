@@ -1,0 +1,272 @@
+[
+  {
+    "subject": "何主臣",
+    "predicate": "styleName",
+    "object": "震"
+  },
+  {
+    "subject": "黃濟叔",
+    "predicate": "styleName",
+    "object": "經"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "studentOf",
+    "object": "文國博"
+  },
+  {
+    "subject": "文國博",
+    "predicate": "teacherOf",
+    "object": "何主臣"
+  },
+  {
+    "subject": "程孟長",
+    "predicate": "styleName",
+    "object": "原"
+  },
+  {
+    "subject": "顧築公",
+    "predicate": "styleName",
+    "object": "墣"
+  },
+  {
+    "subject": "李根",
+    "predicate": "styleName",
+    "object": "居士"
+  },
+  {
+    "subject": "文彭",
+    "predicate": "styleName",
+    "object": "壽承"
+  },
+  {
+    "subject": "文彭",
+    "predicate": "appellation",
+    "object": "國博"
+  },
+  {
+    "subject": "文彭",
+    "predicate": "foundedSchool",
+    "object": "吳門印派"
+  },
+  {
+    "subject": "文彭",
+    "predicate": "nativePlace",
+    "object": "蘇州人"
+  },
+  {
+    "subject": "文彭",
+    "predicate": "teacherOf",
+    "object": "何主臣"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "styleName",
+    "object": "長卿"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "hao",
+    "object": "雪漁"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "nativePlace",
+    "object": "婺源人"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "studentOf",
+    "object": "文彭"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "teacherOf",
+    "object": "蘇宣"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "teacherOf",
+    "object": "梁千秋"
+  },
+  {
+    "subject": "梁千秋",
+    "predicate": "nativePlace",
+    "object": "維揚人"
+  },
+  {
+    "subject": "梁千秋",
+    "predicate": "studentOf",
+    "object": "何主臣"
+  },
+  {
+    "subject": "梁千秋",
+    "predicate": "belongsToSchool",
+    "object": "吳門印派"
+  },
+  {
+    "subject": "蘇宣",
+    "predicate": "styleName",
+    "object": "爾宣"
+  },
+  {
+    "subject": "蘇宣",
+    "predicate": "nativePlace",
+    "object": "儀真人"
+  },
+  {
+    "subject": "蘇宣",
+    "predicate": "studentOf",
+    "object": "文彭"
+  },
+  {
+    "subject": "程邃",
+    "predicate": "styleName",
+    "object": "穆倩"
+  },
+  {
+    "subject": "程邃",
+    "predicate": "nativePlace",
+    "object": "休寧人"
+  },
+  {
+    "subject": "程邃",
+    "predicate": "belongsToSchool",
+    "object": "皖派"
+  },
+  {
+    "subject": "丁敬",
+    "predicate": "styleName",
+    "object": "敬身"
+  },
+  {
+    "subject": "丁敬",
+    "predicate": "nativePlace",
+    "object": "錢塘人"
+  },
+  {
+    "subject": "丁敬",
+    "predicate": "foundedSchool",
+    "object": "浙派"
+  },
+  {
+    "subject": "金一甫",
+    "predicate": "hao",
+    "object": "一甫"
+  },
+  {
+    "subject": "金一甫",
+    "predicate": "nativePlace",
+    "object": "休寧人"
+  },
+  {
+    "subject": "金一甫",
+    "predicate": "studentOf",
+    "object": "何主臣"
+  },
+  {
+    "subject": "金一甫",
+    "predicate": "belongsToSchool",
+    "object": "莆田派"
+  },
+  {
+    "subject": "黃濟叔",
+    "predicate": "styleName",
+    "object": "山松"
+  },
+  {
+    "subject": "黃濟叔",
+    "predicate": "nativePlace",
+    "object": "如皋人"
+  },
+  {
+    "subject": "黃濟叔",
+    "predicate": "belongsToSchool",
+    "object": "吳門印派"
+  },
+  {
+    "subject": "劉漁仲",
+    "predicate": "studentOf",
+    "object": "程邃"
+  },
+  {
+    "subject": "劉漁仲",
+    "predicate": "belongsToSchool",
+    "object": "皖派"
+  },
+  {
+    "subject": "萬年少",
+    "predicate": "hao",
+    "object": "若"
+  },
+  {
+    "subject": "萬年少",
+    "predicate": "styleName",
+    "object": "壽祺"
+  },
+  {
+    "subject": "萬年少",
+    "predicate": "studentOf",
+    "object": "袁籜庵"
+  },
+  {
+    "subject": "顧元方",
+    "predicate": "nativePlace",
+    "object": "婺源人"
+  },
+  {
+    "subject": "顧元方",
+    "predicate": "belongsToSchool",
+    "object": "漳海派"
+  },
+  {
+    "subject": "張穉恭",
+    "predicate": "nativePlace",
+    "object": "婁東人"
+  },
+  {
+    "subject": "張穉恭",
+    "predicate": "belongsToSchool",
+    "object": "婁東派"
+  },
+  {
+    "subject": "何主臣",
+    "predicate": "belongsToSchool",
+    "object": "吳門印派"
+  },
+  {
+    "subject": "文徵明",
+    "predicate": "belongsToSchool",
+    "object": "吳門印派"
+  },
+  {
+    "subject": "文徵明",
+    "predicate": "teacherOf",
+    "object": "文彭"
+  },
+  {
+    "subject": "蘇宣",
+    "predicate": "belongsToSchool",
+    "object": "皖派"
+  },
+  {
+    "subject": "莆田派",
+    "predicate": "founder",
+    "object": "宋比玉"
+  },
+  {
+    "subject": "周亮工",
+    "predicate": "appellation",
+    "object": "櫟園"
+  },
+  {
+    "subject": "周亮工",
+    "predicate": "authorOf",
+    "object": "印人傳"
+  },
+  {
+    "subject": "錢陸燦",
+    "predicate": "authorOf",
+    "object": "印人傳序"
+  }
+]

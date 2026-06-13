@@ -1,0 +1,640 @@
+@prefix ex: <http://example.org/inkperson/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Artifact a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:RDF owl:Ontology ex:ontology .
+
+ex:Work a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:appellation a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:belongsToSchool a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:School .
+
+ex:birthYear a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:integer .
+
+ex:birthYearString a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:brotherOf a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:cbdbId a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:string .
+
+ex:confidence a owl:DatatypeProperty ;
+    rdfs:domain ex:Thing ;
+    rdfs:range xsd:float .
+
+ex:ctextId a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:string .
+
+ex:dataSource a owl:DatatypeProperty ;
+    rdfs:domain ex:Thing ;
+    rdfs:range xsd:string .
+
+ex:deathYear a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:integer .
+
+ex:deathYearString a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:dynasty a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+<http://example.org/inkperson/evidence/丁敬_foundedSchool> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/丁敬> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "丁敬開浙派之先" .
+
+<http://example.org/inkperson/evidence/丁敬_nativePlace> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/丁敬> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "丁敬為錢塘人" .
+
+<http://example.org/inkperson/evidence/丁敬_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/丁敬> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "丁敬字敬身" .
+
+<http://example.org/inkperson/evidence/何主臣_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/何主臣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "何主臣與文彭在師友間" .
+
+<http://example.org/inkperson/evidence/何主臣_hao> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/何主臣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "何主臣震，一字長卿，亦稱雪漁" .
+
+<http://example.org/inkperson/evidence/何主臣_nativePlace> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/何主臣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "新安之婺源人" .
+
+<http://example.org/inkperson/evidence/何主臣_studentOf> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/何主臣> ;
+    ex:extractionMethod "known",
+        "ner-scoped" ;
+    ex:source "卷二" ;
+    ex:sourceText "主臣之於文國博，蓋在師友間",
+        "程孟長原，一字六水，新安人。自何主臣繼文國博起，而印章一道遂歸黃山。" .
+
+<http://example.org/inkperson/evidence/何主臣_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float,
+        "0.99"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/何主臣> ;
+    ex:extractionMethod "known",
+        "ner-scoped" ;
+    ex:source "卷一" ;
+    ex:sourceText "何主臣震，一字長卿，亦稱雪漁",
+        "何主臣震，一字長卿，亦稱雪漁，新安之婺源" .
+
+<http://example.org/inkperson/evidence/何主臣_teacherOf> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float,
+        "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/何主臣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "凍石之名，始見於世，豔傳四方",
+        "千秋繼何主臣起，故為印一以何氏為宗" .
+
+<http://example.org/inkperson/evidence/劉漁仲_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/劉漁仲> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "劉漁仲與程邃同屬皖派" .
+
+<http://example.org/inkperson/evidence/劉漁仲_studentOf> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/劉漁仲> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "予交穆倩垂三十年，得其印不滿三十方，黃子環、劉漁仲歸道山後" .
+
+<http://example.org/inkperson/evidence/周亮工_appellation> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/周亮工> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "櫟園先生周亮工" .
+
+<http://example.org/inkperson/evidence/周亮工_authorOf> a ex:Evidence ;
+    ex:confidence "0.99"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/周亮工> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "錢陸燦序《印人傳》" .
+
+<http://example.org/inkperson/evidence/張穉恭_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/張穉恭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "張穉恭開婁東派" .
+
+<http://example.org/inkperson/evidence/張穉恭_nativePlace> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/張穉恭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "張穉恭為婁東人" .
+
+<http://example.org/inkperson/evidence/文國博_teacherOf> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文國博> ;
+    ex:extractionMethod "ner-scoped" ;
+    ex:source "卷二" ;
+    ex:sourceText "程孟長原，一字六水，新安人。自何主臣繼文國博起，而印章一道遂歸黃山。" .
+
+<http://example.org/inkperson/evidence/文彭_appellation> a ex:Evidence ;
+    ex:confidence "0.99"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文彭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "文壽承彭，溫州公孫，待詔公子，休承郡博兄" .
+
+<http://example.org/inkperson/evidence/文彭_foundedSchool> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文彭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "自國博開之，後人奉為金科玉律" .
+
+<http://example.org/inkperson/evidence/文彭_nativePlace> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文彭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "文國博在南監" .
+
+<http://example.org/inkperson/evidence/文彭_styleName> a ex:Evidence ;
+    ex:confidence "0.99"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文彭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "文壽承彭，溫州公孫" .
+
+<http://example.org/inkperson/evidence/文彭_teacherOf> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文彭> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "國博究心六書，主臣印從之討論" .
+
+<http://example.org/inkperson/evidence/文徵明_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文徵明> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "文徵明與文彭同為吳門人" .
+
+<http://example.org/inkperson/evidence/文徵明_teacherOf> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/文徵明> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "文彭為文徵明之孫，文徵明長於書畫" .
+
+<http://example.org/inkperson/evidence/李根_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/李根> ;
+    ex:extractionMethod "ner-scoped" ;
+    ex:source "卷二" ;
+    ex:sourceText "雲穀居士李根，字阿靈，閩縣人，性怡靜，與物無" .
+
+<http://example.org/inkperson/evidence/梁千秋_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.85"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/梁千秋> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "千秋摹何氏努力加餐等印" .
+
+<http://example.org/inkperson/evidence/梁千秋_nativePlace> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/梁千秋> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "梁千秋袠，維揚人，家白下" .
+
+<http://example.org/inkperson/evidence/梁千秋_studentOf> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/梁千秋> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "千秋繼何主臣起，故為印一以何氏為宗" .
+
+<http://example.org/inkperson/evidence/程孟長_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/程孟長> ;
+    ex:extractionMethod "ner-scoped" ;
+    ex:source "卷二" ;
+    ex:sourceText "程孟長原，一字六水，新安人。自何主臣繼文" .
+
+<http://example.org/inkperson/evidence/程邃_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/程邃> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "印章一道，初尚文、何，數見不鮮，程穆倩邃力變文何舊習" .
+
+<http://example.org/inkperson/evidence/程邃_nativePlace> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/程邃> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "程邃為休寧人" .
+
+<http://example.org/inkperson/evidence/程邃_styleName> a ex:Evidence ;
+    ex:confidence "0.99"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/程邃> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "黃山程穆倩邃" .
+
+<http://example.org/inkperson/evidence/莆田派_founder> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/莆田派> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "莆田派以宋比玉為代表" .
+
+<http://example.org/inkperson/evidence/萬年少_hao> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/萬年少> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "年少後以一字字，字若" .
+
+<http://example.org/inkperson/evidence/萬年少_studentOf> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/萬年少> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "年少與袁籜庵有淵源" .
+
+<http://example.org/inkperson/evidence/萬年少_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/萬年少> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "沙門慧壽，予友彭城萬年少壽祺也" .
+
+<http://example.org/inkperson/evidence/蘇宣_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/蘇宣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "蘇宣與皖派相關" .
+
+<http://example.org/inkperson/evidence/蘇宣_nativePlace> a ex:Evidence ;
+    ex:confidence "0.9"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/蘇宣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "蘇宣為儀真人" .
+
+<http://example.org/inkperson/evidence/蘇宣_studentOf> a ex:Evidence ;
+    ex:confidence "0.85"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/蘇宣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "蘇宣與文彭同時代，受其影響" .
+
+<http://example.org/inkperson/evidence/蘇宣_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/蘇宣> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "蘇宣字爾宣" .
+
+<http://example.org/inkperson/evidence/金一甫_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.85"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/金一甫> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "金一甫與莆田派相關" .
+
+<http://example.org/inkperson/evidence/金一甫_hao> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/金一甫> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "金一甫光先" .
+
+<http://example.org/inkperson/evidence/金一甫_nativePlace> a ex:Evidence ;
+    ex:confidence "0.93"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/金一甫> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "金一甫光先，休寧人" .
+
+<http://example.org/inkperson/evidence/金一甫_studentOf> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/金一甫> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "夫子得之何主臣" .
+
+<http://example.org/inkperson/evidence/錢陸燦_authorOf> a ex:Evidence ;
+    ex:confidence "0.99"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/錢陸燦> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "清錢陸燦序《印人傳》" .
+
+<http://example.org/inkperson/evidence/顧元方_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/顧元方> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "漳海派以顧元方為代表" .
+
+<http://example.org/inkperson/evidence/顧元方_nativePlace> a ex:Evidence ;
+    ex:confidence "0.88"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/顧元方> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "顧元方為婺源人" .
+
+<http://example.org/inkperson/evidence/顧築公_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/顧築公> ;
+    ex:extractionMethod "ner-scoped" ;
+    ex:source "卷二" ;
+    ex:sourceText "顧築公墣，一字山臣，武林人。立品高迥，不" .
+
+<http://example.org/inkperson/evidence/黃濟叔_belongsToSchool> a ex:Evidence ;
+    ex:confidence "0.85"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/黃濟叔> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "黃濟叔印章入神品" .
+
+<http://example.org/inkperson/evidence/黃濟叔_nativePlace> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/黃濟叔> ;
+    ex:extractionMethod "known" ;
+    ex:sourceText "黃濟叔經，一字山松，如皋人" .
+
+<http://example.org/inkperson/evidence/黃濟叔_styleName> a ex:Evidence ;
+    ex:confidence "0.95"^^xsd:float ;
+    ex:extractedBy <http://example.org/inkperson/person/黃濟叔> ;
+    ex:extractionMethod "known",
+        "ner-scoped" ;
+    ex:source "卷二" ;
+    ex:sourceText "黃濟叔經，一字山松，如皋人",
+        "黃濟叔經，一字山松，如皋人。身長，鬚不甚" .
+
+ex:extractedBy a owl:ObjectProperty ;
+    rdfs:domain ex:Evidence ;
+    rdfs:range ex:Person .
+
+ex:extractionMethod a owl:DatatypeProperty ;
+    rdfs:domain ex:Evidence ;
+    rdfs:range xsd:string .
+
+ex:fatherOf a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person ;
+    owl:inverseOf ex:sonOf .
+
+ex:foundedSchool a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:School .
+
+ex:friendOf a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:fromPlace a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Place .
+
+ex:hao a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:hasPeriod a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:TimePeriod .
+
+ex:hasStyle a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Style .
+
+ex:influencedBy a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:inheritedFrom a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:nativePlace a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:occupation a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:officialRank a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:period a owl:DatatypeProperty ;
+    rdfs:domain ex:School ;
+    rdfs:range xsd:string .
+
+ex:periodName a owl:DatatypeProperty ;
+    rdfs:domain ex:TimePeriod ;
+    rdfs:range xsd:string .
+
+ex:personName a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:placeName a owl:DatatypeProperty ;
+    rdfs:domain ex:Place ;
+    rdfs:range xsd:string .
+
+ex:region a owl:DatatypeProperty ;
+    rdfs:domain ex:School ;
+    rdfs:range xsd:string .
+
+ex:sameAs a owl:ObjectProperty ;
+    rdfs:domain ex:Thing ;
+    rdfs:range ex:Thing .
+
+ex:schoolName a owl:DatatypeProperty ;
+    rdfs:domain ex:School ;
+    rdfs:range xsd:string .
+
+ex:source a owl:ObjectProperty ;
+    rdfs:domain ex:Evidence ;
+    rdfs:range ex:Thing .
+
+ex:sourceText a owl:DatatypeProperty ;
+    rdfs:domain ex:Evidence ;
+    rdfs:range xsd:string .
+
+ex:styleName a owl:DatatypeProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:teacherOf a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person ;
+    owl:inverseOf ex:studentOf .
+
+ex:Style a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+<http://example.org/inkperson/person/李根> a ex:Person ;
+    ex:personName "李根" ;
+    ex:styleName "居士" .
+
+<http://example.org/inkperson/person/程孟長> a ex:Person ;
+    ex:personName "程孟長" ;
+    ex:styleName "原" .
+
+<http://example.org/inkperson/person/莆田派> a ex:Person ;
+    ex:founder "宋比玉" ;
+    ex:personName "莆田派" .
+
+<http://example.org/inkperson/person/袁籜庵> a ex:Person ;
+    ex:personName "袁籜庵" .
+
+<http://example.org/inkperson/person/錢陸燦> a ex:Person ;
+    ex:authorOf "印人傳序" ;
+    ex:personName "錢陸燦" .
+
+<http://example.org/inkperson/person/顧築公> a ex:Person ;
+    ex:personName "顧築公" ;
+    ex:styleName "墣" .
+
+<http://example.org/inkperson/school/婁東派> a ex:School ;
+    ex:schoolName "婁東派" .
+
+<http://example.org/inkperson/school/浙派> a ex:School ;
+    ex:schoolName "浙派" .
+
+<http://example.org/inkperson/school/漳海派> a ex:School ;
+    ex:schoolName "漳海派" .
+
+<http://example.org/inkperson/school/莆田派> a ex:School ;
+    ex:schoolName "莆田派" .
+
+ex:sonOf a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:studentOf a owl:ObjectProperty ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:Place a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:TimePeriod a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+<http://example.org/inkperson/person/劉漁仲> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/皖派> ;
+    ex:personName "劉漁仲" ;
+    ex:studentOf <http://example.org/inkperson/person/程邃> .
+
+<http://example.org/inkperson/person/周亮工> a ex:Person ;
+    ex:appellation "櫟園" ;
+    ex:authorOf "印人傳" ;
+    ex:personName "周亮工" .
+
+<http://example.org/inkperson/person/張穉恭> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/婁東派> ;
+    ex:nativePlace "婁東人" ;
+    ex:personName "張穉恭" .
+
+<http://example.org/inkperson/person/文國博> a ex:Person ;
+    ex:personName "文國博" ;
+    ex:teacherOf <http://example.org/inkperson/person/何主臣> .
+
+<http://example.org/inkperson/person/文徵明> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:personName "文徵明" ;
+    ex:teacherOf <http://example.org/inkperson/person/文彭> .
+
+<http://example.org/inkperson/person/顧元方> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/漳海派> ;
+    ex:nativePlace "婺源人" ;
+    ex:personName "顧元方" .
+
+<http://example.org/inkperson/person/丁敬> a ex:Person ;
+    ex:foundedSchool <http://example.org/inkperson/school/浙派> ;
+    ex:nativePlace "錢塘人" ;
+    ex:personName "丁敬" ;
+    ex:styleName "敬身" .
+
+<http://example.org/inkperson/person/萬年少> a ex:Person ;
+    ex:hao "若" ;
+    ex:personName "萬年少" ;
+    ex:studentOf <http://example.org/inkperson/person/袁籜庵> ;
+    ex:styleName "壽祺" .
+
+<http://example.org/inkperson/person/黃濟叔> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:nativePlace "如皋人" ;
+    ex:personName "黃濟叔" ;
+    ex:styleName "山松",
+        "經" .
+
+<http://example.org/inkperson/school/皖派> a ex:School ;
+    ex:schoolName "皖派" .
+
+<http://example.org/inkperson/person/梁千秋> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:nativePlace "維揚人" ;
+    ex:personName "梁千秋" ;
+    ex:studentOf <http://example.org/inkperson/person/何主臣> .
+
+<http://example.org/inkperson/person/程邃> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/皖派> ;
+    ex:nativePlace "休寧人" ;
+    ex:personName "程邃" ;
+    ex:styleName "穆倩" .
+
+<http://example.org/inkperson/person/金一甫> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/莆田派> ;
+    ex:hao "一甫" ;
+    ex:nativePlace "休寧人" ;
+    ex:personName "金一甫" ;
+    ex:studentOf <http://example.org/inkperson/person/何主臣> .
+
+<http://example.org/inkperson/person/蘇宣> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/皖派> ;
+    ex:nativePlace "儀真人" ;
+    ex:personName "蘇宣" ;
+    ex:studentOf <http://example.org/inkperson/person/文彭> ;
+    ex:styleName "爾宣" .
+
+<http://example.org/inkperson/school/吳門印派> a ex:School ;
+    ex:schoolName "吳門印派" .
+
+<http://example.org/inkperson/person/文彭> a ex:Person ;
+    ex:appellation "國博" ;
+    ex:foundedSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:nativePlace "蘇州人" ;
+    ex:personName "文彭" ;
+    ex:styleName "壽承" ;
+    ex:teacherOf <http://example.org/inkperson/person/何主臣> .
+
+<http://example.org/inkperson/person/何主臣> a ex:Person ;
+    ex:belongsToSchool <http://example.org/inkperson/school/吳門印派> ;
+    ex:hao "雪漁" ;
+    ex:nativePlace "婺源人" ;
+    ex:personName "何主臣" ;
+    ex:studentOf <http://example.org/inkperson/person/文國博>,
+        <http://example.org/inkperson/person/文彭> ;
+    ex:styleName "長卿",
+        "震" ;
+    ex:teacherOf <http://example.org/inkperson/person/梁千秋>,
+        <http://example.org/inkperson/person/蘇宣> .
+
+ex:School a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:Evidence a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
+ex:Person a owl:Class ;
+    rdfs:subClassOf ex:Thing .
+
