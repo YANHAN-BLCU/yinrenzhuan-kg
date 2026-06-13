@@ -17,7 +17,7 @@ logger = logging.getLogger("pipeline")
 
 def run_pipeline(
     text_path: Path = None,
-    skip_llm: bool = True,
+    use_rules_only: bool = False,
     skip_entity_linking: bool = False,
     skip_analysis: bool = False,
     skip_rag: bool = False,
@@ -28,9 +28,9 @@ def run_pipeline(
         CENTRALITY_OUTPUT, COMMUNITIES_OUTPUT, FAISS_INDEX,
     )
     from src.backend.extraction.text_processor import TextProcessor
-    from src.backend.extraction.ner_rules import NERRules
-    from src.backend.extraction.relation_extractor import RelationExtractor
-    from src.backend.extraction.llm_extractor import LLMExtractor
+    from src.backend.extraction.llm_ner import LLMENTyper
+    from src.backend.extraction.llm_relation_extractor import LLMRelationExtractor, normalize_predicate
+    from src.backend.extraction.entity_normalizer import EntityNormalizer, PersonNormalizer
     from src.backend.rdf.turtle_writer import TurtleWriter
     from src.backend.rdf.rdf_store import RDFStore
     from src.backend.linking.linker import EntityLinker
@@ -48,41 +48,51 @@ def run_pipeline(
     entries = tp.preprocess(text_file)
     logger.info(f"Loaded {len(entries)} entries")
 
-    logger.info(f"=== Stage 2: NER & Relation Extraction ===")
-    ner = NERRules()
-    extractor = RelationExtractor()
+    logger.info(f"=== Stage 2: NER & Relation Extraction (LLM + Few-shot) ===")
+    normalizer = EntityNormalizer()
 
-    # 第一遍：NER 收集所有人名
-    all_persons = set()
-    entry_persons = {}
+    # ---- Phase 2a: NER via LLM (with fallback to rules) ----
+    llm_ner = LLMENTyper(use_rules_only=use_rules_only)
+    all_ner_entities = {}   # entry_title -> list of (name, type, normalized_name)
+    all_persons = set()     # 所有已识别的标准人物名
+
     for entry in entries:
-        ner_result = ner.extract_all(entry.content)
-        persons_in_entry = [e.text for e in ner_result.entities if e.type == "PERSON"]
-        entry_persons[entry.title] = set(persons_in_entry)
-        for p in persons_in_entry:
-            all_persons.add(p)
+        ner_result = llm_ner.extract(entry.content, entry.title, entry.chapter)
+        entities_in_entry = []
+        for e in ner_result.entities:
+            std_name = e.normalized if e.type == "PERSON" else e.name
+            entities_in_entry.append((std_name, e.type, e.name))
+            if e.type == "PERSON":
+                all_persons.add(std_name)
+        all_ner_entities[entry.title] = entities_in_entry
     logger.info(f"NER found {len(all_persons)} unique persons")
 
-    # 第二遍：基于 NER 人名约束抽取关系
+    # ---- Phase 2b: Relation Extraction via LLM (with fallback to rules) ----
+    llm_rel = LLMRelationExtractor(use_rules_only=use_rules_only)
     all_triples = []
+
     for entry in entries:
-        known = entry_persons.get(entry.title, set())
-        rel_result = extractor.extract_from_entry(entry.content, entry.title, entry.chapter, known)
-        for triple in rel_result.triples:
+        persons_in_entry = [p for p, t, _ in all_ner_entities.get(entry.title, []) if t == "PERSON"]
+        known_set = set(persons_in_entry)
+        rel_triples = llm_rel.extract(
+            entry.content, known_set, entry.title, entry.chapter
+        )
+        for t in rel_triples:
+            # Convert RelationTriple → dict matching pipeline format
             all_triples.append({
-                "subject": triple.subject,
-                "predicate": triple.predicate,
-                "object": triple.obj,
-                "confidence": triple.confidence,
-                "method": triple.method,
-                "evidence": triple.evidence,
-                "chapter": triple.chapter,
-                "source_text": triple.source_text,
+                "subject": t.subject,
+                "predicate": t.predicate,
+                "object": t.obj,
+                "confidence": t.confidence,
+                "method": "llm" if llm_rel.available else "rule",
+                "evidence": t.evidence,
+                "chapter": t.chapter,
+                "source_text": t.source_text,
             })
 
     logger.info(f"Extracted {len(all_triples)} triples, {len(all_persons)} unique persons")
 
-    # 合并知识库三元组（高可信度，覆盖核心人物）
+    # Merge knowledge base triples (high-confidence, core coverage)
     from src.backend.extraction.knowledge_base import INK_TRIPLES as KB_TRIPLES
     seen_keys = {(t["subject"], t["predicate"], t["object"]) for t in all_triples}
     for kb_t in KB_TRIPLES:
@@ -92,43 +102,81 @@ def run_pipeline(
             seen_keys.add(key)
     logger.info(f"After knowledge base merge: {len(all_triples)} triples")
 
+    # Schema predicate normalization: old predicate name → new schema format
+    # This ensures backward compatibility with KB triples using old names
+    for t in all_triples:
+        pred = t.get("predicate", "")
+        t["predicate"] = normalize_predicate(pred)
+
     EXTRACTED_TRIPLES.write_text(json.dumps(all_triples, ensure_ascii=False, indent=2), encoding="utf-8")
     logger.info(f"Saved triples to {EXTRACTED_TRIPLES}")
 
-    if not skip_llm:
-        logger.info(f"=== Stage 2b: LLM-assisted extraction ===")
-        llm = LLMExtractor()
-        for entry in entries[:20]:
-            llm_triples = llm.extract(entry.content)
-            for t in llm_triples:
-                all_triples.append({
-                    "subject": t.subject,
-                    "predicate": t.predicate,
-                    "object": t.obj,
-                    "confidence": t.confidence,
-                    "method": "llm",
-                    "evidence": t.evidence,
-                    "chapter": entry.chapter,
-                    "source_text": entry.title,
-                })
-        logger.info(f"After LLM: {len(all_triples)} triples")
+    # ---- Phase 2c: Apply entity normalization (alias → standard name) ----
+    person_normalizer = PersonNormalizer()
+    for t in all_triples:
+        subj_res = person_normalizer.normalize(t["subject"])
+        obj_res = person_normalizer.normalize(t["object"])
+        t["subject"] = subj_res.normalized
+        t["object"] = obj_res.normalized
 
     logger.info(f"=== Stage 3: Build RDF Graph ===")
     writer = TurtleWriter()
 
-    # 直接复用 Stage 2 的 NER 验证人名
-    all_ner_persons = all_persons
-    logger.info(f"NER validated persons: {len(all_ner_persons)}")
+    # Schema predicate → RDF property name mapping
+    SCHEMA_TO_RDF = {
+        # kinship
+        "kinship:fatherOf": "fatherOf",
+        "kinship:sonOf": "sonOf",
+        "kinship:ancestorOf": "fatherOf",
+        "kinship:descendantOf": "sonOf",
+        # education
+        "education:teacherOf": "teacherOf",
+        "education:studentOf": "studentOf",
+        "education:inheritedFrom": "inheritedFrom",
+        # social
+        "social:friendOf": "friendOf",
+        "social:influencedBy": "influencedBy",
+        # attribute
+        "attribute:hasStyleName": "styleName",
+        "attribute:hasHao": "hao",
+        "attribute:hasAppellation": "appellation",
+        "attribute:nativePlace": "nativePlace",
+        "attribute:dynasty": "dynasty",
+        # school
+        "school:founderOf": "foundedSchool",
+        "school:belongsTo": "belongsToSchool",
+        # legacy
+        "foundedSchool": "foundedSchool",
+        "belongsToSchool": "belongsToSchool",
+        "nativePlace": "nativePlace",
+        "fromPlace": "nativePlace",
+    }
 
-    # 人名对象谓词（object 应该是人名）
+    def to_rdf_predicate(pred: str) -> str:
+        return SCHEMA_TO_RDF.get(pred, pred)
+
+    logger.info(f"NER validated persons: {len(all_persons)}")
+
+    # Predicates that map Person → Person (object is a person name)
     PERSON_REL_PREDICATES = {
+        # Old names (still used in KB triples)
         "fatherOf", "sonOf", "teacherOf", "studentOf",
         "friendOf", "brotherOf", "inheritedFrom", "influencedBy",
+        # New Schema names
+        "kinship:fatherOf", "kinship:sonOf",
+        "kinship:ancestorOf", "kinship:descendantOf",
+        "education:teacherOf", "education:studentOf",
+        "education:inheritedFrom",
+        "social:friendOf", "social:influencedBy",
     }
-    # 字/号/籍贯等属性（object 是字符串，不是人名）
+    # Predicates that map Person → string attribute
     ATTR_PREDICATES = {
         "styleName", "hao", "dynasty", "fromPlace",
         "appellation", "nativePlace",
+        # New Schema attribute names
+        "attribute:hasStyleName", "attribute:hasHao",
+        "attribute:hasAppellation", "attribute:hasAppellation",
+        "attribute:nativePlace", "attribute:dynasty",
     }
 
     person_set = set()
@@ -148,19 +196,19 @@ def run_pipeline(
         is_kb_triple = t.get("method") == "known"
 
         # subject 必须是人名（NER 发现 或 KB 知识库）
-        if not is_kb_triple and subj not in all_ner_persons:
+        if not is_kb_triple and subj not in all_persons:
             continue
 
         if pred in PERSON_REL_PREDICATES:
             # KB triples: allow object even if not in NER (e.g., KB says "文彭→文彭", NER might not have 文彭)
-            if obj in all_ner_persons or is_kb_triple:
+            if obj in all_persons or is_kb_triple:
                 person_set.add(subj)
                 person_set.add(obj)
                 rel_triples.append(t)
         elif pred in ATTR_PREDICATES:
             person_set.add(subj)
             attr_triples.append(t)
-        elif pred in ("foundedSchool", "belongsToSchool"):
+        elif pred in ("foundedSchool", "belongsToSchool", "school:founderOf", "school:belongsTo"):
             person_set.add(subj)
             attr_triples.append(t)
             schools_seen.add(obj)
@@ -182,10 +230,10 @@ def run_pipeline(
     for t in attr_triples + rel_triples:
         writer.add_triple(
             subject=t["subject"],
-            predicate=t["predicate"],
+            predicate=to_rdf_predicate(t["predicate"]),
             obj=t["object"],
             confidence=t.get("confidence", 0.95),
-            method=t.get("method", "rule"),
+            method=t.get("method", "llm"),
             evidence_text=t.get("evidence", ""),
             chapter=t.get("chapter", ""),
         )
@@ -333,7 +381,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="印人传知识图谱构建流程")
     parser.add_argument("--text", type=Path, default=None, help="《印人传》文本路径")
-    parser.add_argument("--skip-llm", action="store_true", help="跳过LLM抽取")
+    parser.add_argument("--use-rules-only", action="store_true",
+                          help="跳过 LLM，仅使用正则规则抽取（默认：LLM优先，规则兜底）")
     parser.add_argument("--skip-linking", action="store_true", help="跳过实体链接")
     parser.add_argument("--skip-analysis", action="store_true", help="跳过图分析")
     parser.add_argument("--skip-rag", action="store_true", help="跳过RAG构建")
@@ -341,7 +390,7 @@ if __name__ == "__main__":
 
     result = run_pipeline(
         text_path=args.text,
-        skip_llm=args.skip_llm,
+        use_rules_only=args.use_rules_only,
         skip_entity_linking=args.skip_linking,
         skip_analysis=args.skip_analysis,
         skip_rag=args.skip_rag,

@@ -1,61 +1,62 @@
 {
-  "community_4": {
-    "id": 4,
+  "community_1": {
+    "id": 1,
     "members": [
       "school/吳門印派",
-      "何主臣",
-      "文國博",
+      "何震",
       "文彭",
       "文徵明",
       "梁千秋",
-      "蘇宣",
-      "黃濟叔"
+      "黃學"
     ],
-    "member_count": 8,
-    "internal_edges": 11,
+    "member_count": 6,
+    "internal_edges": 8,
     "relation_types": {
-      "teacherOf": 3,
-      "foundedSchool": 1,
       "belongsToSchool": 4,
-      "studentOf": 3
+      "foundedSchool": 1,
+      "teacherOf": 2,
+      "studentOf": 1
     },
     "dominant_schools": {
-      "belongsToSchool": 5,
+      "belongsToSchool": 4,
       "foundedSchool": 1
     }
   },
   "community_2": {
     "id": 2,
     "members": [
-      "萬年少",
-      "袁籜庵"
+      "school/皖派",
+      "劉漁仲",
+      "程邃",
+      "蘇宣"
     ],
-    "member_count": 2,
-    "internal_edges": 1,
+    "member_count": 4,
+    "internal_edges": 4,
     "relation_types": {
+      "belongsToSchool": 3,
       "studentOf": 1
     },
-    "dominant_schools": {}
+    "dominant_schools": {
+      "belongsToSchool": 3
+    }
   },
   "community_3": {
     "id": 3,
     "members": [
-      "school/皖派",
-      "劉漁仲",
-      "程邃"
+      "school/浙派",
+      "丁敬"
     ],
-    "member_count": 3,
-    "internal_edges": 3,
+    "member_count": 2,
+    "internal_edges": 1,
     "relation_types": {
-      "belongsToSchool": 2,
-      "studentOf": 1
+      "foundedSchool": 1
     },
     "dominant_schools": {
-      "belongsToSchool": 2
+      "foundedSchool": 1
     }
   },
-  "community_5": {
-    "id": 5,
+  "community_0": {
+    "id": 0,
     "members": [
       "school/莆田派",
       "金一甫"
@@ -69,8 +70,8 @@
       "belongsToSchool": 1
     }
   },
-  "community_6": {
-    "id": 6,
+  "community_5": {
+    "id": 5,
     "members": [
       "school/婁東派",
       "張穉恭"
@@ -84,8 +85,21 @@
       "belongsToSchool": 1
     }
   },
-  "community_1": {
-    "id": 1,
+  "community_6": {
+    "id": 6,
+    "members": [
+      "萬年少",
+      "袁籜庵"
+    ],
+    "member_count": 2,
+    "internal_edges": 1,
+    "relation_types": {
+      "studentOf": 1
+    },
+    "dominant_schools": {}
+  },
+  "community_4": {
+    "id": 4,
     "members": [
       "school/漳海派",
       "顧元方"
@@ -97,21 +111,6 @@
     },
     "dominant_schools": {
       "belongsToSchool": 1
-    }
-  },
-  "community_0": {
-    "id": 0,
-    "members": [
-      "school/浙派",
-      "丁敬"
-    ],
-    "member_count": 2,
-    "internal_edges": 1,
-    "relation_types": {
-      "foundedSchool": 1
-    },
-    "dominant_schools": {
-      "foundedSchool": 1
     }
   }
 }

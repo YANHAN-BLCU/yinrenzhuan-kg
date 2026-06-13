@@ -1,77 +1,27 @@
 [
   {
-    "subject": "何主臣",
-    "predicate": "styleName",
-    "object": "震",
-    "confidence": 0.95,
-    "method": "ner-scoped",
-    "evidence": "何主臣震，一字長卿，亦稱雪漁，新安之婺源",
-    "chapter": "卷一",
-    "source_text": "書何主臣章"
-  },
-  {
-    "subject": "黃濟叔",
-    "predicate": "styleName",
-    "object": "經",
-    "confidence": 0.95,
-    "method": "ner-scoped",
-    "evidence": "黃濟叔經，一字山松，如皋人。身長，鬚不甚",
-    "chapter": "卷二",
-    "source_text": "書《黃濟叔印譜》前"
-  },
-  {
-    "subject": "何主臣",
-    "predicate": "studentOf",
-    "object": "文國博",
-    "confidence": 0.93,
-    "method": "ner-scoped",
-    "evidence": "程孟長原，一字六水，新安人。自何主臣繼文國博起，而印章一道遂歸黃山。",
-    "chapter": "卷二",
-    "source_text": "書程孟長印章前"
-  },
-  {
-    "subject": "文國博",
-    "predicate": "teacherOf",
-    "object": "何主臣",
-    "confidence": 0.93,
-    "method": "ner-scoped",
-    "evidence": "程孟長原，一字六水，新安人。自何主臣繼文國博起，而印章一道遂歸黃山。",
-    "chapter": "卷二",
-    "source_text": "書程孟長印章前"
-  },
-  {
-    "subject": "程孟長",
-    "predicate": "styleName",
-    "object": "原",
-    "confidence": 0.95,
-    "method": "ner-scoped",
-    "evidence": "程孟長原，一字六水，新安人。自何主臣繼文",
-    "chapter": "卷二",
-    "source_text": "書程孟長印章前"
-  },
-  {
     "subject": "顧築公",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "墣",
     "confidence": 0.95,
-    "method": "ner-scoped",
+    "method": "rule",
     "evidence": "顧築公墣，一字山臣，武林人。立品高迥，不",
     "chapter": "卷二",
     "source_text": "書顧築公印譜前"
   },
   {
     "subject": "李根",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "居士",
     "confidence": 0.95,
-    "method": "ner-scoped",
+    "method": "rule",
     "evidence": "雲穀居士李根，字阿靈，閩縣人，性怡靜，與物無",
     "chapter": "卷二",
     "source_text": "書李雲穀印譜前"
   },
   {
     "subject": "文彭",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "壽承",
     "confidence": 0.99,
     "method": "known",
@@ -79,7 +29,7 @@
   },
   {
     "subject": "文彭",
-    "predicate": "appellation",
+    "predicate": "attribute:hasAppellation",
     "object": "國博",
     "confidence": 0.99,
     "method": "known",
@@ -87,7 +37,7 @@
   },
   {
     "subject": "文彭",
-    "predicate": "foundedSchool",
+    "predicate": "school:founderOf",
     "object": "吳門印派",
     "confidence": 0.95,
     "method": "known",
@@ -95,7 +45,7 @@
   },
   {
     "subject": "文彭",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "蘇州人",
     "confidence": 0.9,
     "method": "known",
@@ -103,7 +53,7 @@
   },
   {
     "subject": "文彭",
-    "predicate": "teacherOf",
+    "predicate": "education:teacherOf",
     "object": "何主臣",
     "confidence": 0.93,
     "method": "known",
@@ -111,7 +61,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "長卿",
     "confidence": 0.99,
     "method": "known",
@@ -119,7 +69,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "hao",
+    "predicate": "attribute:hasHao",
     "object": "雪漁",
     "confidence": 0.95,
     "method": "known",
@@ -127,7 +77,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "婺源人",
     "confidence": 0.95,
     "method": "known",
@@ -135,7 +85,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "studentOf",
+    "predicate": "education:studentOf",
     "object": "文彭",
     "confidence": 0.93,
     "method": "known",
@@ -143,7 +93,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "teacherOf",
+    "predicate": "education:teacherOf",
     "object": "蘇宣",
     "confidence": 0.88,
     "method": "known",
@@ -151,7 +101,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "teacherOf",
+    "predicate": "education:teacherOf",
     "object": "梁千秋",
     "confidence": 0.9,
     "method": "known",
@@ -159,7 +109,7 @@
   },
   {
     "subject": "梁千秋",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "維揚人",
     "confidence": 0.95,
     "method": "known",
@@ -167,7 +117,7 @@
   },
   {
     "subject": "梁千秋",
-    "predicate": "studentOf",
+    "predicate": "education:studentOf",
     "object": "何主臣",
     "confidence": 0.93,
     "method": "known",
@@ -175,7 +125,7 @@
   },
   {
     "subject": "梁千秋",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "吳門印派",
     "confidence": 0.85,
     "method": "known",
@@ -183,7 +133,7 @@
   },
   {
     "subject": "蘇宣",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "爾宣",
     "confidence": 0.95,
     "method": "known",
@@ -191,7 +141,7 @@
   },
   {
     "subject": "蘇宣",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "儀真人",
     "confidence": 0.9,
     "method": "known",
@@ -199,7 +149,7 @@
   },
   {
     "subject": "蘇宣",
-    "predicate": "studentOf",
+    "predicate": "education:studentOf",
     "object": "文彭",
     "confidence": 0.85,
     "method": "known",
@@ -207,7 +157,7 @@
   },
   {
     "subject": "程邃",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "穆倩",
     "confidence": 0.99,
     "method": "known",
@@ -215,7 +165,7 @@
   },
   {
     "subject": "程邃",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "休寧人",
     "confidence": 0.93,
     "method": "known",
@@ -223,7 +173,7 @@
   },
   {
     "subject": "程邃",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "皖派",
     "confidence": 0.9,
     "method": "known",
@@ -231,7 +181,7 @@
   },
   {
     "subject": "丁敬",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "敬身",
     "confidence": 0.95,
     "method": "known",
@@ -239,7 +189,7 @@
   },
   {
     "subject": "丁敬",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "錢塘人",
     "confidence": 0.95,
     "method": "known",
@@ -247,7 +197,7 @@
   },
   {
     "subject": "丁敬",
-    "predicate": "foundedSchool",
+    "predicate": "school:founderOf",
     "object": "浙派",
     "confidence": 0.95,
     "method": "known",
@@ -255,7 +205,7 @@
   },
   {
     "subject": "金一甫",
-    "predicate": "hao",
+    "predicate": "attribute:hasHao",
     "object": "一甫",
     "confidence": 0.95,
     "method": "known",
@@ -263,7 +213,7 @@
   },
   {
     "subject": "金一甫",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "休寧人",
     "confidence": 0.93,
     "method": "known",
@@ -271,7 +221,7 @@
   },
   {
     "subject": "金一甫",
-    "predicate": "studentOf",
+    "predicate": "education:studentOf",
     "object": "何主臣",
     "confidence": 0.88,
     "method": "known",
@@ -279,7 +229,7 @@
   },
   {
     "subject": "金一甫",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "莆田派",
     "confidence": 0.85,
     "method": "known",
@@ -287,7 +237,15 @@
   },
   {
     "subject": "黃濟叔",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
+    "object": "經",
+    "confidence": 0.95,
+    "method": "known",
+    "evidence": "黃濟叔經，一字山松"
+  },
+  {
+    "subject": "黃濟叔",
+    "predicate": "attribute:hasStyleName",
     "object": "山松",
     "confidence": 0.95,
     "method": "known",
@@ -295,7 +253,7 @@
   },
   {
     "subject": "黃濟叔",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "如皋人",
     "confidence": 0.95,
     "method": "known",
@@ -303,7 +261,7 @@
   },
   {
     "subject": "黃濟叔",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "吳門印派",
     "confidence": 0.85,
     "method": "known",
@@ -311,7 +269,7 @@
   },
   {
     "subject": "劉漁仲",
-    "predicate": "studentOf",
+    "predicate": "education:studentOf",
     "object": "程邃",
     "confidence": 0.93,
     "method": "known",
@@ -319,7 +277,7 @@
   },
   {
     "subject": "劉漁仲",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "皖派",
     "confidence": 0.9,
     "method": "known",
@@ -327,7 +285,7 @@
   },
   {
     "subject": "萬年少",
-    "predicate": "hao",
+    "predicate": "attribute:hasHao",
     "object": "若",
     "confidence": 0.93,
     "method": "known",
@@ -335,7 +293,7 @@
   },
   {
     "subject": "萬年少",
-    "predicate": "styleName",
+    "predicate": "attribute:hasStyleName",
     "object": "壽祺",
     "confidence": 0.95,
     "method": "known",
@@ -343,7 +301,7 @@
   },
   {
     "subject": "萬年少",
-    "predicate": "studentOf",
+    "predicate": "education:studentOf",
     "object": "袁籜庵",
     "confidence": 0.88,
     "method": "known",
@@ -351,7 +309,7 @@
   },
   {
     "subject": "顧元方",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "婺源人",
     "confidence": 0.88,
     "method": "known",
@@ -359,7 +317,7 @@
   },
   {
     "subject": "顧元方",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "漳海派",
     "confidence": 0.88,
     "method": "known",
@@ -367,7 +325,7 @@
   },
   {
     "subject": "張穉恭",
-    "predicate": "nativePlace",
+    "predicate": "attribute:nativePlace",
     "object": "婁東人",
     "confidence": 0.9,
     "method": "known",
@@ -375,7 +333,7 @@
   },
   {
     "subject": "張穉恭",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "婁東派",
     "confidence": 0.9,
     "method": "known",
@@ -383,7 +341,7 @@
   },
   {
     "subject": "何主臣",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "吳門印派",
     "confidence": 0.88,
     "method": "known",
@@ -391,7 +349,7 @@
   },
   {
     "subject": "文徵明",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "吳門印派",
     "confidence": 0.88,
     "method": "known",
@@ -399,7 +357,7 @@
   },
   {
     "subject": "文徵明",
-    "predicate": "teacherOf",
+    "predicate": "education:teacherOf",
     "object": "文彭",
     "confidence": 0.88,
     "method": "known",
@@ -407,7 +365,7 @@
   },
   {
     "subject": "蘇宣",
-    "predicate": "belongsToSchool",
+    "predicate": "school:belongsTo",
     "object": "皖派",
     "confidence": 0.9,
     "method": "known",
@@ -423,7 +381,7 @@
   },
   {
     "subject": "周亮工",
-    "predicate": "appellation",
+    "predicate": "attribute:hasAppellation",
     "object": "櫟園",
     "confidence": 0.95,
     "method": "known",
