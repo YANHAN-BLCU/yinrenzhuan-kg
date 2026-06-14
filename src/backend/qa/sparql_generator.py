@@ -151,12 +151,16 @@ class SPARQLGenerator:
             return None
 
         person = entities[0]
+        # 多人查询（如 "X 和 Y 的关系"）：两人及以上时走"关系"模板
+        if len(entities) >= 2 and intent in ("query_path", "query_relation", "query_list"):
+            return self._build_two_person_relation_sparql(entities)
 
         # 规则模式：query_attribute 需要从问句中提取具体属性关键词
         # 其他意图使用映射表
         INTENT_MAP = {
             "query_attribute": None,     # 从问句词推导具体属性（见下方）
-            "query_relation": "ask_teacher",
+            "query_relation": "ask_teacher",  # 问"X 的老师/师承" → 查 X 的老师
+            "query_student": "ask_student",   # 问"X 的弟子/门人" → 查 X 的学生
             "query_school": "ask_school",
             "query_path": "ask_relation",
             "query_list": "ask_relation",
@@ -169,6 +173,14 @@ class SPARQLGenerator:
             # 从问句中提取具体属性查询意图
             attr_intent = _detect_intent(question)
             sparql = self._rule_based_generate(person, question, attr_intent)
+        elif intent == "query_school":
+            # 流派类查询：若 entity 是流派名，则查该流派成员；否则查某人所属流派
+            from ..rdf.ontology import is_known_school, canonical_school_name
+            if is_known_school(person):
+                canonical = canonical_school_name(person)
+                sparql = self._rule_based_generate(canonical, question, "ask_school_members")
+            else:
+                sparql = self._rule_based_generate(person, question, mapped)
         elif mapped:
             sparql = self._rule_based_generate(person, question, mapped)
         else:
@@ -246,25 +258,27 @@ class SPARQLGenerator:
             )
 
         if intent == "ask_teacher":
+            # 查"X 的老师" → 找 X.hasTeacher.* (出边) 或 .*hasStudent X (入边)
             return (
                 f"{p}"
                 f"SELECT ?teacherName ?rel WHERE {{\n"
                 f"  ?person ex:personName \"{person}\" .\n"
                 f"  {{ ?person ex:hasTeacher ?teacher . BIND(\"hasTeacher\" AS ?rel) }}\n"
                 f"  UNION\n"
-                f"  {{ ?person ex:studentOf ?teacher . BIND(\"studentOf\" AS ?rel) }}\n"
+                f"  {{ ?teacher ex:hasStudent ?person . BIND(\"hasStudent\" AS ?rel) }}\n"
                 f"  ?teacher ex:personName ?teacherName .\n"
                 f"}}"
             )
 
         if intent == "ask_student":
+            # 查"X 的弟子" → 找 X.hasStudent.* (出边) 或 .*hasTeacher X (入边)
             return (
                 f"{p}"
                 f"SELECT ?studentName ?rel WHERE {{\n"
                 f"  ?teacher ex:personName \"{person}\" .\n"
                 f"  {{ ?teacher ex:hasStudent ?student . BIND(\"hasStudent\" AS ?rel) }}\n"
                 f"  UNION\n"
-                f"  {{ ?teacher ex:studentOf ?student . BIND(\"studentOf\" AS ?rel) }}\n"
+                f"  {{ ?student ex:hasTeacher ?teacher . BIND(\"hasTeacher\" AS ?rel) }}\n"
                 f"  ?student ex:personName ?studentName .\n"
                 f"}}"
             )
@@ -283,24 +297,52 @@ class SPARQLGenerator:
             )
 
         if intent == "ask_school":
+            # 查某人所属/开创的流派（人 → 派）
+            # 注意：流派创始人在图谱中用 ex:hasFounder 关系；普通成员用 ex:belongsToSchool
             return (
                 f"{p}"
-                f"SELECT ?schoolName WHERE {{\n"
+                f"SELECT DISTINCT ?schoolName WHERE {{\n"
                 f"  ?person ex:personName \"{person}\" .\n"
-                f"  ?person ex:belongsToSchool ?school .\n"
+                f"  {{\n"
+                f"    ?person ex:belongsToSchool ?school .\n"
+                f"  }} UNION {{\n"
+                f"    ?person ex:hasFounder ?school .\n"
+                f"  }}\n"
                 f"  ?school ex:schoolName ?schoolName .\n"
                 f"}}"
             )
 
+        if intent == "ask_school_members":
+            # 查某流派的所有成员（派 → 人）。person 已是 canonical（繁体）流派名
+            return (
+                f"{p}"
+                f"SELECT DISTINCT ?personName WHERE {{\n"
+                f"  ?person ex:belongsToSchool ?school .\n"
+                f"  ?school ex:schoolName \"{person}\" .\n"
+                f"  ?person ex:personName ?personName .\n"
+                f"}}"
+            )
+
         if intent == "ask_relation":
+            # 查与某人有直接师承/交游/亲属关系的人（任意方向）
             return (
                 f"{p}"
                 f"SELECT ?rel ?targetName WHERE {{\n"
-                f"  ?person ex:personName \"{person}\" .\n"
-                f"  ?person ?rel ?target .\n"
-                f"  ?target ex:personName ?targetName .\n"
-                f"  FILTER(?rel IN (ex:hasTeacher, ex:hasStudent, ex:hasFriend,\n"
-                f"                  ex:hasFather, ex:hasSon, ex:hasFounder, ex:influencedBy))\n"
+                f"  {{\n"
+                f"    ?person ex:personName \"{person}\" .\n"
+                f"    ?person ?rel ?target .\n"
+                f"    ?target ex:personName ?targetName .\n"
+                f"    FILTER(?rel IN (ex:hasTeacher, ex:hasStudent, ex:hasFriend,\n"
+                f"                  ex:hasFather, ex:hasSon, ex:hasFounder, ex:influencedBy,\n"
+                f"                  ex:inheritedFrom))\n"
+                f"  }} UNION {{\n"
+                f"    ?target ?rel ?person .\n"
+                f"    ?person ex:personName \"{person}\" .\n"
+                f"    ?target ex:personName ?targetName .\n"
+                f"    FILTER(?rel IN (ex:hasTeacher, ex:hasStudent, ex:hasFriend,\n"
+                f"                  ex:hasFather, ex:hasSon, ex:hasFounder, ex:influencedBy,\n"
+                f"                  ex:inheritedFrom))\n"
+                f"  }}\n"
                 f"}}"
             )
 
@@ -355,6 +397,33 @@ class SPARQLGenerator:
             f"  ?person ?p ?o .\n"
             f"  FILTER(?p NOT IN (ex:personName, ex:confidence, ex:dataSource,\n"
             f"                   ex:extractionMethod, ex:ctextId, ex:cbdbId))\n"
+            f"}}"
+        )
+
+    def _build_two_person_relation_sparql(self, entities: List[str]) -> Optional[str]:
+        """生成"X 和 Y 关系"查询的 SPARQL：查两人之间所有直接关系。"""
+        if len(entities) < 2:
+            return None
+        p1, p2 = entities[0], entities[1]
+        p = _make_prefix()
+        return (
+            f"{p}"
+            f"SELECT ?rel ?targetName WHERE {{\n"
+            f"  ?personA ex:personName \"{p1}\" .\n"
+            f"  ?personB ex:personName \"{p2}\" .\n"
+            f"  {{\n"
+            f"    ?personA ex:hasTeacher ?personB . BIND(\"hasTeacher\" AS ?rel) ?personB ex:personName ?targetName .\n"
+            f"  }} UNION {{\n"
+            f"    ?personA ex:hasStudent ?personB . BIND(\"hasStudent\" AS ?rel) ?personB ex:personName ?targetName .\n"
+            f"  }} UNION {{\n"
+            f"    ?personA ex:hasFriend ?personB . BIND(\"hasFriend\" AS ?rel) ?personB ex:personName ?targetName .\n"
+            f"  }} UNION {{\n"
+            f"    ?personB ex:hasTeacher ?personA . BIND(\"reverse:hasTeacher\" AS ?rel) ?personA ex:personName ?targetName .\n"
+            f"  }} UNION {{\n"
+            f"    ?personB ex:hasStudent ?personA . BIND(\"reverse:hasStudent\" AS ?rel) ?personA ex:personName ?targetName .\n"
+            f"  }} UNION {{\n"
+            f"    ?personB ex:hasFriend ?personA . BIND(\"reverse:hasFriend\" AS ?rel) ?personA ex:personName ?targetName .\n"
+            f"  }}\n"
             f"}}"
         )
 

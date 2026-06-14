@@ -4,21 +4,59 @@ ctext.org（中国哲学书电子化计划）API 客户端。
 支持：
 - 人物搜索
 - 人物详情页解析
+
+注意：ctext.org 有频率限制，可能返回 403 Forbidden，
+需要添加 User-Agent 和重试逻辑。
 """
 import logging
 import re
+import time
 import httpx
 
 logger = logging.getLogger(__name__)
 
 
 class CtextClient:
-    """ctext.org API 客户端，支持自动重定向。"""
+    """ctext.org API 客户端，支持自动重试和 UA 伪装。"""
 
     BASE_URL = "https://ctext.org"
 
     def __init__(self):
         self.client = httpx.Client(timeout=30.0, follow_redirects=True)
+
+    def _request(self, method: str, url: str, **kwargs) -> httpx.Response:
+        """
+        带重试的 HTTP 请求。
+        ctext 对频繁请求返回 403，需要指数退避重试。
+        """
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        }
+        kwargs.setdefault("headers", {})
+        kwargs["headers"].update(headers)
+
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                resp = self.client.request(method, url, **kwargs)
+                if resp.status_code == 403 and attempt < max_retries - 1:
+                    wait = (attempt + 1) * 2.0
+                    logger.debug(f"ctext 403, retrying in {wait}s (attempt {attempt + 1}/{max_retries})")
+                    time.sleep(wait)
+                    continue
+                return resp
+            except httpx.TimeoutException:
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                raise
+        return self.client.request(method, url, **kwargs)
 
     def search_person(self, name: str) -> list:
         """
@@ -38,7 +76,7 @@ class CtextClient:
                 "cid": "",
                 "searchfor": name,
             }
-            resp = self.client.get(url, params=params)
+            resp = self._request("GET", url, params=params)
             if resp.status_code != 200:
                 logger.warning(f"ctext search failed: {resp.status_code}")
                 return []
@@ -87,7 +125,7 @@ class CtextClient:
         if not ctext_url:
             return {}
         try:
-            resp = self.client.get(ctext_url)
+            resp = self._request("GET", ctext_url)
             if resp.status_code != 200:
                 return {}
             return self._parse_detail(resp.text)

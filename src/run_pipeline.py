@@ -23,9 +23,7 @@ def run_pipeline(
     skip_rag: bool = False,
 ):
     from src.backend.utils.config import (
-        YINRENCHUAN_TXT, OUTPUT_DIR, RDF_OUTPUT, LINKED_OUTPUT,
-        EXTRACTED_TRIPLES, PERSONS_JSON, RELATIONS_JSON, GRAPH_JSON,
-        CENTRALITY_OUTPUT, COMMUNITIES_OUTPUT, FAISS_INDEX,
+        YINRENCHUAN_TXT, OUTPUT_DIR, RDF_OUTPUT, LINKED_OUTPUT, FAISS_INDEX,
     )
     from src.backend.extraction.text_processor import TextProcessor
     from src.backend.extraction.llm_ner import LLMENTyper
@@ -68,12 +66,17 @@ def run_pipeline(
     logger.info(f"NER found {len(all_persons)} unique persons")
 
     # ---- Phase 2b: Relation Extraction via LLM (with fallback to rules) ----
+    # KB 中的人物名也作为 known_persons 的一部分，使规则抽取器能在文彭词条里也识别出"何主臣"等
+    # 跨词条人物。这是解决"何震无关系边"等跨词条问题所必需的。
+    from src.backend.extraction.knowledge_base import INK_TRIPLES as KB_TRIPLES
+    kb_persons = {t["subject"] for t in KB_TRIPLES} | {t["object"] for t in KB_TRIPLES}
     llm_rel = LLMRelationExtractor(use_rules_only=use_rules_only)
     all_triples = []
 
     for entry in entries:
+        # 跨词条识别：当前词条的 NER 人物 + 全局人物 + KB 人物
         persons_in_entry = [p for p, t, _ in all_ner_entities.get(entry.title, []) if t == "PERSON"]
-        known_set = set(persons_in_entry)
+        known_set = set(persons_in_entry) | all_persons | kb_persons
         rel_triples = llm_rel.extract(
             entry.content, known_set, entry.title, entry.chapter
         )
@@ -93,7 +96,6 @@ def run_pipeline(
     logger.info(f"Extracted {len(all_triples)} triples, {len(all_persons)} unique persons")
 
     # Merge knowledge base triples (high-confidence, core coverage)
-    from src.backend.extraction.knowledge_base import INK_TRIPLES as KB_TRIPLES
     seen_keys = {(t["subject"], t["predicate"], t["object"]) for t in all_triples}
     for kb_t in KB_TRIPLES:
         key = (kb_t["subject"], kb_t["predicate"], kb_t["object"])
@@ -108,8 +110,8 @@ def run_pipeline(
         pred = t.get("predicate", "")
         t["predicate"] = normalize_predicate(pred)
 
-    EXTRACTED_TRIPLES.write_text(json.dumps(all_triples, ensure_ascii=False, indent=2), encoding="utf-8")
-    logger.info(f"Saved triples to {EXTRACTED_TRIPLES}")
+    # 三元组元数据（confidence/method/evidence）已通过 TurtleWriter 写入 TTL 的 Evidence 节点
+    logger.info(f"Triples metadata will be persisted in TTL Evidence nodes")
 
     # ---- Phase 2c: Apply entity normalization (alias → standard name) ----
     person_normalizer = PersonNormalizer()
@@ -123,18 +125,20 @@ def run_pipeline(
     writer = TurtleWriter()
 
     # Schema predicate → RDF property name mapping
+    # 与 ontology.normalize_predicate 保持一致（教育关系用 hasTeacher/hasStudent 等 OWL 命名）
+    from src.backend.rdf.ontology import normalize_predicate as _ont_normalize
     SCHEMA_TO_RDF = {
         # kinship
-        "kinship:fatherOf": "fatherOf",
-        "kinship:sonOf": "sonOf",
-        "kinship:ancestorOf": "fatherOf",
-        "kinship:descendantOf": "sonOf",
-        # education
-        "education:teacherOf": "teacherOf",
-        "education:studentOf": "studentOf",
+        "kinship:fatherOf": "hasFather",
+        "kinship:sonOf": "hasSon",
+        "kinship:ancestorOf": "hasAncestor",
+        "kinship:descendantOf": "hasDescendant",
+        # education (与 ontology 保持一致：studentOf → hasTeacher, teacherOf → hasStudent)
+        "education:teacherOf": "hasStudent",
+        "education:studentOf": "hasTeacher",
         "education:inheritedFrom": "inheritedFrom",
         # social
-        "social:friendOf": "friendOf",
+        "social:friendOf": "hasFriend",
         "social:influencedBy": "influencedBy",
         # attribute
         "attribute:hasStyleName": "styleName",
@@ -143,17 +147,28 @@ def run_pipeline(
         "attribute:nativePlace": "nativePlace",
         "attribute:dynasty": "dynasty",
         # school
-        "school:founderOf": "foundedSchool",
+        "school:founderOf": "hasFounder",
         "school:belongsTo": "belongsToSchool",
         # legacy
-        "foundedSchool": "foundedSchool",
+        "fatherOf": "hasFather",
+        "sonOf": "hasSon",
+        "teacherOf": "hasStudent",
+        "studentOf": "hasTeacher",
+        "friendOf": "hasFriend",
+        "foundedSchool": "hasFounder",
         "belongsToSchool": "belongsToSchool",
         "nativePlace": "nativePlace",
         "fromPlace": "nativePlace",
+        "hasAncestor": "hasAncestor",
+        "founder": "hasFounder",
     }
 
     def to_rdf_predicate(pred: str) -> str:
-        return SCHEMA_TO_RDF.get(pred, pred)
+        # 优先用 ontology 的 normalize_predicate（统一映射），缺失时退回本地映射
+        rdf_name = _ont_normalize(pred)
+        if rdf_name == pred and pred in SCHEMA_TO_RDF:
+            return SCHEMA_TO_RDF[pred]
+        return rdf_name
 
     logger.info(f"NER validated persons: {len(all_persons)}")
 
@@ -342,30 +357,25 @@ def run_pipeline(
         ]
         RELATIONS_JSON.write_text(json.dumps(rels_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    logger.info(f"=== Stage 6: RAG Index (optional) ===")
+    logger.info(f"=== Stage 6: RAG Index ===")
     if not skip_rag:
-        import signal, functools
-        def _timeout_handler(signum, frame):
-            raise TimeoutError("RAG initialization timed out")
         try:
-            signal.signal(signal.SIGALRM, _timeout_handler)
-            signal.alarm(30)
-            try:
-                rag_entries = [
-                    {
-                        "content": entry.content,
-                        "title": entry.title,
-                        "chapter": entry.chapter,
-                    }
-                    for entry in entries
-                ]
-                retriever = RAGRetriever(rag_entries)
-                retriever.initialize()
-                logger.info("RAG retriever initialized")
-            finally:
-                signal.alarm(0)
-        except (ImportError, AttributeError, TimeoutError) as e:
-            logger.warning(f"RAG initialization skipped: {e}")
+            rag_entries = [
+                {
+                    "content": entry.content,
+                    "title": entry.title,
+                    "chapter": entry.chapter,
+                }
+                for entry in entries
+            ]
+            retriever = RAGRetriever(rag_entries)
+            retriever.initialize()
+            if retriever._initialized:
+                meta_path = FAISS_INDEX.with_suffix(".meta.json")
+                retriever.save(FAISS_INDEX, meta_path)
+                logger.info(f"RAG retriever saved: {FAISS_INDEX.name} + {meta_path.name}")
+            else:
+                logger.warning("RAG initialization failed (embedding model not available)")
         except Exception as e:
             logger.warning(f"RAG initialization skipped: {e}")
 

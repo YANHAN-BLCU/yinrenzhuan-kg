@@ -20,6 +20,7 @@ import logging
 from typing import Literal
 from .state import QAState, ErrorType
 from .nodes import (
+    normalize_question,
     parse_intent,
     decide_route,
     generate_sparql,
@@ -30,6 +31,7 @@ from .nodes import (
 )
 from .tools import QATools
 from .sparql_generator import SPARQLGenerator
+from .question_normalizer import QuestionNormalizer
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,8 @@ def build_langgraph_workflow(
     rdf_store,
     use_llm_sparql: bool = False,
     use_llm_fallback: bool = True,
+    rag_retriever=None,
+    use_question_normalizer: bool = True,
 ) -> "CompiledStateGraph":
     """
     构建 LangGraph 工作流图。
@@ -46,13 +50,14 @@ def build_langgraph_workflow(
         rdf_store: RDFStore 实例
         use_llm_sparql: 是否使用 LLM 生成 SPARQL（需 Ollama）
         use_llm_fallback: 是否使用 LLM 生成兜底答案
+        rag_retriever: RAGRetriever 实例（可选，用于从原文检索上下文）
+        use_question_normalizer: 是否启用 LLM 问句规范化（默认开启）
 
     Returns:
         编译后的 LangGraph StateGraph
     """
     try:
         from langgraph.graph import StateGraph, END, START
-        from langgraph.checkpoint.memory import MemorySaver
     except ImportError:
         logger.warning("langgraph not installed, using fallback workflow")
         return None
@@ -60,8 +65,12 @@ def build_langgraph_workflow(
     tools = QATools(rdf_store)
     sparql_gen = SPARQLGenerator(use_llm=use_llm_sparql)
     llm_client = _LLMClient(use_llm_fallback) if use_llm_fallback else None
+    normalizer = QuestionNormalizer(enabled=use_question_normalizer)
 
     # --- 定义节点函数（绑定工具） ---
+    def _normalize(s: QAState) -> QAState:
+        return normalize_question(s, normalizer)
+
     def _parse_intent(s: QAState) -> QAState:
         return parse_intent(s)
 
@@ -81,12 +90,13 @@ def build_langgraph_workflow(
         return synthesize_answer(s)
 
     def _handle_error(s: QAState) -> QAState:
-        return handle_error(s, llm_client)
+        return handle_error(s, llm_client, rag_retriever)
 
     # --- 构建图 ---
     builder = StateGraph(QAState)
 
     # 添加节点
+    builder.add_node("normalize_question", _normalize)
     builder.add_node("parse_intent", _parse_intent)
     builder.add_node("decide_route", _decide_route)
     builder.add_node("generate_sparql", _generate_sparql)
@@ -96,7 +106,9 @@ def build_langgraph_workflow(
     builder.add_node("handle_error", _handle_error)
 
     # 设置入口
-    builder.add_edge(START, "parse_intent")
+    builder.add_edge(START, "normalize_question")
+    # normalize_question → parse_intent
+    builder.add_edge("normalize_question", "parse_intent")
 
     # parse_intent → decide_route
     builder.add_edge("parse_intent", "decide_route")
@@ -163,8 +175,8 @@ def build_langgraph_workflow(
     builder.add_edge("synthesize_answer", END)
     builder.add_edge("handle_error", END)
 
-    # 编译图
-    graph = builder.compile(checkpointer=MemorySaver())
+    # 编译图（无 checkpointer：每次问答独立，无需跨请求持久化）
+    graph = builder.compile()
     logger.info("LangGraph workflow compiled successfully")
     return graph
 
@@ -174,6 +186,8 @@ def run_workflow_simple(
     question: str,
     use_llm_sparql: bool = False,
     use_llm_fallback: bool = True,
+    rag_retriever=None,
+    use_question_normalizer: bool = True,
 ) -> QAState:
     """
     非 LangGraph 回退工作流（直接顺序调用）。
@@ -183,9 +197,11 @@ def run_workflow_simple(
     tools = QATools(rdf_store)
     sparql_gen = SPARQLGenerator(use_llm=use_llm_sparql)
     llm_client = _LLMClient(use_llm_fallback) if use_llm_fallback else None
+    normalizer = QuestionNormalizer(enabled=use_question_normalizer)
 
     state: QAState = {
         "question": question,
+        "normalized_question": "",
         "parsed_entities": [],
         "intent": "unknown",
         "needs_kg_query": False,
@@ -204,7 +220,8 @@ def run_workflow_simple(
         "handled": False,
     }
 
-    # 节点1-2
+    # 节点0-2：问句规范化 + 实体/意图抽取
+    state = normalize_question(state, normalizer)
     state = parse_intent(state)
     state = decide_route(state)
 
@@ -226,19 +243,19 @@ def run_workflow_simple(
     if verification and verification.is_valid and verification.row_count > 0:
         state = synthesize_answer(state)
     else:
-        state = handle_error(state, llm_client)
+        state = handle_error(state, llm_client, rag_retriever)
 
     return state
 
 
-def build_qa_workflow(rdf_store):
+def build_qa_workflow(rdf_store, rag_retriever=None):
     """兼容旧 API：返回工作流对象（LangGraph graph 或简单函数）。"""
-    graph = build_langgraph_workflow(rdf_store)
+    graph = build_langgraph_workflow(rdf_store, rag_retriever=rag_retriever)
     if graph is not None:
         return graph
 
     def _run(question: str) -> "QAState":
-        return run_workflow_simple(rdf_store, question)
+        return run_workflow_simple(rdf_store, question, rag_retriever=rag_retriever)
 
     return _run
 

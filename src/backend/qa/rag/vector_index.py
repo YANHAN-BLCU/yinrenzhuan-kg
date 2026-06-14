@@ -39,16 +39,15 @@ class VectorIndex:
         if not self._built:
             return []
 
-        query_vec = np.array([query_embedding], dtype=np.float32)
-        faiss.normalize_L2(query_vec)
-
         if self.index is not None:
             try:
                 import faiss
+                query_vec = np.array([query_embedding], dtype=np.float32)
+                faiss.normalize_L2(query_vec)
                 distances, indices = self.index.search(query_vec, min(top_k, self.index.ntotal))
                 results = []
-                for i, (dist, idx) in enumerate(zip(distances[0], indices[0])):
-                    if idx < len(self.metadata):
+                for dist, idx in zip(distances[0], indices[0]):
+                    if 0 <= idx < len(self.metadata):
                         result = dict(self.metadata[int(idx)])
                         result["score"] = float(dist)
                         results.append(result)
@@ -56,6 +55,7 @@ class VectorIndex:
             except Exception:
                 pass
 
+        # Numpy fallback
         q = np.array(query_embedding, dtype=np.float32)
         norm_q = q / (np.linalg.norm(q) + 1e-10)
         scores = np.dot(self.vectors, norm_q)

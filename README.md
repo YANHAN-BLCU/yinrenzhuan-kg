@@ -268,4 +268,64 @@ start index.html
 
 ---
 
+## 快速开始
+
+### 1. 克隆仓库
+```bash
+git clone https://github.com/YANHAN-BLCU/yinrenzhuan-kg.git
+cd yinrenzhuan-kg
+```
+
+### 2. 创建虚拟环境
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+```
+
+### 3. 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+### 4. 配置 API Key（重要：自己提供）
+
+本项目需要 LLM API 才能完整运行（问句规范化、答案合成、RAG Embedding）。
+**代码中不包含任何硬编码 Key，所有凭据都从 `.env` 读取；`.env` 已被 `.gitignore` 排除，不会被提交。**
+
+复制配置模板并填入你自己的 API Key：
+```bash
+cp .env.example .env
+# 然后用编辑器打开 .env，把 your_xxx_key_here 替换为真实值
+```
+
+需要准备的 API（任选兼容 OpenAI 协议的服务）：
+
+| 用途 | 必需 | 推荐服务 | 参考 |
+|---|---|---|---|
+| `OPENAI_API_KEY` | 主体 LLM | DeepSeek / 通义 / 智谱 | `OPENAI_BASE_URL=https://api.deepseek.com/v1` |
+| `EMBEDDING_API_KEY` | 向量检索 | SiliconFlow（送额度） | 默认 `BAAI/bge-m3` |
+| Ollama（可选） | SPARQL LLM 生成 | 本地 `qwen2.5:7b` | 需单独装 Ollama |
+
+**没有 LLM 也能跑**：SPARQL 规则模式可回答大部分基础查询；只有"问句规范化"和"RAG 兜底"会失效。
+
+### 5. 启动服务
+```bash
+python src/main.py
+# 浏览器打开 http://127.0.0.1:8000
+```
+
+### 6. （可选）重新生成知识图谱
+
+```bash
+# 1) 抽取三元组（需要 LLM）
+python src/run_pipeline.py
+
+# 2) 启动后访问 /api/build_index 构建 FAISS 索引
+```
+
+---
+
 > 本项目为课程设计作品，所有知识抽取与推理结果均标注置信度与来源，可追溯至《印人传》原文。

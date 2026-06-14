@@ -75,6 +75,7 @@ class QAState(TypedDict, total=False):
 
     # === 输入 ===
     question: str
+    normalized_question: str  # 经 LLM 规范化后的问句（可与 question 相同）
 
     # === 解析 & 意图 ===
     parsed_entities: List[str]

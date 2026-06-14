@@ -47,6 +47,7 @@ CTEXT = Namespace("http://example.org/ctext/")         # ctext 外部链接
 CBDB = Namespace("http://example.org/cbdb/")           # CBDB 外部链接
 
 EX = INK   # 别名
+INK_NS = INK  # 别名（兼容 knowledge_merger 等模块）
 
 # ============================================================
 # 类定义
@@ -242,9 +243,11 @@ SCHEMA_TO_RDF = {
     "kinship:sonOf":           "hasSon",
     "kinship:ancestorOf":      "hasAncestor",
     "kinship:descendantOf":    "hasDescendant",
-    # education
-    "education:teacherOf":      "hasTeacher",
-    "education:studentOf":      "hasStudent",
+    # education (注意语义方向: studentOf/teacherOf 是动态的，subject 可以是学生或师父)
+    # education:studentOf = "subject students-of object" → subject=学生, object=师父 → RDF 写 hasTeacher
+    # education:teacherOf = "subject teachers-of object" → subject=师父, object=学生 → RDF 写 hasStudent
+    "education:teacherOf":      "hasStudent",
+    "education:studentOf":      "hasTeacher",
     "education:inheritedFrom":  "inheritedFrom",
     # social
     "social:friendOf":         "hasFriend",
@@ -261,8 +264,8 @@ SCHEMA_TO_RDF = {
     # legacy
     "fatherOf":                "hasFather",
     "sonOf":                   "hasSon",
-    "teacherOf":               "hasTeacher",
-    "studentOf":               "hasStudent",
+    "teacherOf":               "hasStudent",   # 语义：subject=teacher, teacherOf object=student → subject hasStudent object
+    "studentOf":               "hasTeacher",   # 语义：subject=student, studentOf object=teacher → subject hasTeacher object
     "friendOf":                "hasFriend",
     "influencedBy":            "influencedBy",
     "foundedSchool":           "hasFounder",
@@ -296,3 +299,57 @@ def get_object_uri(obj: str, predicate: str) -> URIRef:
     elif pred == "createdWork":
         return get_work_uri(obj)
     return get_person_uri(obj)
+
+
+# ============================================================
+# 已知流派列表（与 data/output/linked_graph.ttl 中的流派 URI 同步）
+# ============================================================
+KNOWN_SCHOOLS: dict = {
+    # key: 流派的「字面写法」（同时支持繁简），value: 图谱中真实的 schoolName
+    "浙派":     "浙派",
+    "皖派":     "皖派",
+    "漳海派":   "漳海派",
+    "莆田派":   "莆田派",
+    "婁東派":   "婁東派",
+    "娄东派":   "婁東派",
+    "吳門印派": "吳門印派",
+    "吴门印派": "吳門印派",
+    "吴门派":   "吳門印派",
+    "吳門派":   "吳門印派",
+}
+
+
+# 简体→繁体 单字映射（覆盖常见用字，足以应付流派名）
+_S2T = {
+    "吴": "吳", "门": "門", "娄": "婁", "东": "東",
+    "东": "東", "闽": "閩", "国": "國", "会": "會",
+    "师": "師", "长": "長", "号": "號", "庐": "廬",
+    "庆": "慶", "齐": "齊", "苏": "蘇", "兴": "興",
+    "学": "學", "华": "華", "风": "風", "马": "馬",
+    "齐": "齊", "云": "雲", "庐": "廬", "凤": "鳳",
+    "显": "顯", "变": "變", "观": "觀", "记": "記",
+    "东": "東",
+}
+
+
+def to_traditional(s: str) -> str:
+    """将常见简体字转换为繁体，便于匹配图谱中以繁体存储的流派名。"""
+    return "".join(_S2T.get(c, c) for c in s)
+
+
+def canonical_school_name(name: str) -> str:
+    """
+    规范化流派名：先查 KNOWN_SCHOOLS，再回退到繁简转换。
+    返回图谱中真实的 schoolName（如「吳門印派」）；未识别则原样返回。
+    """
+    if name in KNOWN_SCHOOLS:
+        return KNOWN_SCHOOLS[name]
+    trad = to_traditional(name)
+    if trad in KNOWN_SCHOOLS:
+        return KNOWN_SCHOOLS[trad]
+    return name
+
+
+def is_known_school(name: str) -> bool:
+    """判断字符串是否为已知流派名（支持繁简）。"""
+    return name in KNOWN_SCHOOLS or to_traditional(name) in KNOWN_SCHOOLS

@@ -1,7 +1,43 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Virtual environment
 .venv/
 venv/
+env/
+
+# Environment / secrets — NEVER commit
 .env
+.env.*
+!.env.example
+
+# OS / IDE
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Build / log outputs
+*.log
+*.bak
+*.tmp
+dist/
+build/
+
+# Large generated artifacts (rebuild locally)
+data/output/yinrenchuan_faiss.index
+data/output/yinrenchuan_faiss.meta.json
+data/output/yinrenchuan_faiss.meta.model.txt
+data/raw/
+data/dictionaries/
+
+# Test / cache
+.pytest_cache/
+.coverage
+htmlcov/

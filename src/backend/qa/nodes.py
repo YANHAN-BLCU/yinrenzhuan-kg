@@ -2,13 +2,14 @@
 LangGraph 工作流节点实现。
 
 节点职责：
-1. parse_intent      — 输入解析：提取人物实体，分类意图
-2. decide_route      — 意图判断：决定是否查询 KG 或直接 LLM 回答
-3. generate_sparql   — SPARQL 生成（如需查询 KG）
-4. execute_query     — 查询执行
-5. verify_result     — 结果验证
-6. synthesize_answer — 答案合成
-7. handle_error      — 异常处理（SPARQL错误/无结果 → LLM人设回答）
+1. normalize_question — LLM 问句规范化（可选）
+2. parse_intent      — 输入解析：提取人物实体，分类意图
+3. decide_route      — 意图判断：决定是否查询 KG 或直接 LLM 回答
+4. generate_sparql   — SPARQL 生成（如需查询 KG）
+5. execute_query     — 查询执行
+6. verify_result     — 结果验证
+7. synthesize_answer — 答案合成
+8. handle_error      — 异常处理（SPARQL错误/无结果 → LLM人设回答）
 """
 import logging
 import re
@@ -34,6 +35,37 @@ SEAL_ENGRAVING_PERSONA = (
 
 
 # ============================================================
+# 节点0：问句规范化（基于 LLM 把变体改写为标准问句）
+# ============================================================
+
+def normalize_question(state: QAState, normalizer=None) -> QAState:
+    """
+    问句规范化节点（可选）。
+    调用 LLM 把"皖派都有谁"等变体改写为"皖派流派有哪些人？"等标准问句，
+    让下游的 entity 抽取和 SPARQL 模板能稳定工作。
+
+    若 normalizer 为 None 或未启用，直接使用原 question。
+    """
+    question = state.get("question", "")
+    if not question:
+        state["normalized_question"] = question
+        return state
+
+    if normalizer is None:
+        state["normalized_question"] = question
+        return state
+
+    try:
+        normalized = normalizer.normalize(question)
+        state["normalized_question"] = normalized
+    except Exception as e:
+        logger.warning(f"[NODE:normalize_question] failed: {e}")
+        state["normalized_question"] = question
+
+    return state
+
+
+# ============================================================
 # 节点1：输入解析
 # ============================================================
 
@@ -46,12 +78,56 @@ def parse_intent(state: QAState) -> QAState:
     2. 判断问题意图（query_attribute / query_relation / query_school / query_path / opinion / general）
     """
     question = state.get("question", "")
-    logger.info(f"[NODE:parse_intent] question={question}")
+    # 优先用规范化问句（若 normalizer 已运行过）
+    norm_q = state.get("normalized_question", "")
+    analysis_question = norm_q if norm_q and norm_q != question else question
+    logger.info(f"[NODE:parse_intent] question={question} normalized={norm_q or '(unchanged)'}")
 
     # --- 提取人物实体 ---
+    # 优先基于规范化问句分析；否则用原 question
+    question_clean = analysis_question.rstrip("？?！!。.,，、；;：:")
+
+    # 剥离已知问句尾/前缀词，避免它们与实体粘连（如"文彭是谁" → "文彭"）。
+    # 用循环剥离多次（如"何震的弟子有哪些"先剥"有哪些"再剥"的弟子"）。
+    question_stripped = question_clean
+    # 常见问句尾（按长度倒序，优先匹配长的；含"有哪些弟/学/门/徒"等长尾）
+    TAILS = [
+        "属于哪一派", "属于哪派", "属于哪个流派", "属于哪个派",
+        "是什么人", "是哪位", "属于什么", "属于哪",
+        "的弟子", "的徒弟", "的学生", "的门徒", "的师父", "的老师", "的师傅", "的老师傅",
+        "有哪些弟子", "有哪些徒弟", "有哪些学生", "有哪些门徒", "有哪些人",
+        "师从谁", "师从何人", "师谁", "受业于谁", "传自谁", "跟谁学", "从谁学",
+        "跟谁", "从谁", "从何处",
+        "有几个", "是多少", "有多少",
+        "的字", "的号", "的生平", "的简介", "的籍贯", "的故乡", "的出生地",
+        "是什么", "是谁", "是哪", "属于", "的人",
+        "是什么关系", "什么关系", "是什么派别", "什么派别",
+        "的最短关系路径", "的最短路径", "之间",
+        "有哪些", "是哪个", "哪位", "哪些",
+        "的吗", "的呢", "了吗", "吧", "啊", "呢",
+    ]
+    # 最多剥离 5 次（防止死循环）
+    for _ in range(5):
+        stripped_once = False
+        for tail in TAILS:
+            if question_stripped.endswith(tail) and len(question_stripped) > len(tail):
+                question_stripped = question_stripped[:-len(tail)]
+                stripped_once = True
+                break
+        if not stripped_once:
+            break
+    # 常见问句前缀
+    for prefix in ["请问", "请告诉我", "你知道", "请帮我"]:
+        if question_stripped.startswith(prefix):
+            question_stripped = question_stripped[len(prefix):]
+            break
+
     # 提取所有连续的 2-4 个汉字子串（人名多为 2 字）
+    # 先把"X 和 Y"中的连接词替换成空格，避免"文彭和何震"被切错
     person_pattern = re.compile(r"[\u4e00-\u9fa5]{2,4}")
-    raw_matches = person_pattern.findall(question)
+    person_split_pattern = re.compile(r"[和与及、，,]+")
+    question_for_entities = person_split_pattern.sub(" ", question_stripped)
+    raw_matches = person_pattern.findall(question_for_entities)
 
     entities = []
     seen = set()
@@ -62,6 +138,10 @@ def parse_intent(state: QAState) -> QAState:
             "印学", "篆刻", "知识", "问题", "师承", "弟子", "师父", "老师",
             "学习", "研究", "开创", "著名", "多少", "哪些", "几个", "这里",
             "以上", "以下", "之间", "之前", "之后",
+            "是谁", "是什么", "是哪", "如何", "怎样", "的人", "有哪些",
+            "属于", "属于哪", "哪位", "哪一派",
+            "弟子", "徒弟", "学生", "门徒", "师父", "师傅", "老师", "老师傅",
+            "朋友", "友人", "同门", "师兄", "师弟", "师姐", "师妹",
         }
         SKIP_PREFIXES = {"什", "哪", "如", "怎", "为", "请", "有"}
         if name in SKIP_WORDS or len(name) < 2:
@@ -69,11 +149,14 @@ def parse_intent(state: QAState) -> QAState:
         if name[:2] in SKIP_PREFIXES:
             continue
         # 清理末尾的常见助词/名词后缀（如"文彭的" → "文彭"，"文彭字" → "文彭"）
+        # 也清理问句尾（"文彭是谁" → "文彭"，"吴门印派人" → "吴门印派"）
         name_clean = name
-        while name_clean and name_clean[-1] in "的了是在和之有被所字师友派":
+        SUFFIX_CHARS = "的了是在和之有被所字师友吗呢啊呀哈呗人？?！!。."  # 补充全/半角问号、句号、感叹号，避免"文彭？"被当成 entity
+        # 只清理一个尾字（避免误伤：丁敬属于哪 → 丁敬属于 → 丁敬属）
+        if name_clean and name_clean[-1] in SUFFIX_CHARS:
             name_clean = name_clean[:-1]
-        # 清理开头的常见助词
-        while name_clean and name_clean[0] in "的了是在和之有被所字师友":
+        # 清理开头的常见助词（也只清理一个）
+        if name_clean and name_clean[0] in "的了是在和之有被所字师友":
             name_clean = name_clean[1:]
         if len(name_clean) < 2 or name_clean in SKIP_WORDS:
             continue
@@ -81,14 +164,25 @@ def parse_intent(state: QAState) -> QAState:
             seen.add(name_clean)
             entities.append(name_clean)
 
-    # --- 意图判断 ---
-    intent = _classify_intent(question)
+    # --- 意图判断（基于规范化问句） ---
+    intent = _classify_intent(analysis_question)
     needs_kg = intent not in ("opinion", "unknown")
     skip_reason = ""
     if intent == "opinion":
         skip_reason = "观点性问题，无需查询知识图谱"
     elif intent == "unknown":
         skip_reason = "问题意图不明确"
+
+    # query_school 意图：清理 entity 末尾的"流派"等后缀（"皖派流派" → "皖派"）
+    if intent == "query_school" and entities:
+        SCHOOL_SUFFIX = ("流派", "印派", "门", "派别")
+        cleaned = []
+        for e in entities:
+            for suf in SCHOOL_SUFFIX:
+                if e.endswith(suf) and len(e) > len(suf):
+                    e = e[:-len(suf)]
+            cleaned.append(e)
+        entities = cleaned
 
     state["parsed_entities"] = entities
     state["intent"] = intent
@@ -105,8 +199,13 @@ def _classify_intent(question: str) -> str:
 
     优先级（高→低）：师承/流派 > 师父/弟子 > 字/号 > 其他
     """
-    # 第一优先级：师承关系类
-    if any(kw in question for kw in ["师承", "师父", "老师", "弟子", "徒弟", "学", "教", "传授"]):
+    # 第一优先级：师承关系类（细分"师"与"弟子"）
+    if any(kw in question for kw in ["弟子", "徒弟", "门徒", "传人", "学徒"]):
+        return "query_student"
+    if any(kw in question for kw in ["师承", "师父", "老师", "师傅", "学自", "师从", "受业"]):
+        return "query_relation"
+    # 通用"学/教/传授"（需要进一步看上下文）
+    if any(kw in question for kw in ["学", "教", "传授"]):
         return "query_relation"
 
     # 第二优先级：流派类
@@ -118,7 +217,11 @@ def _classify_intent(question: str) -> str:
         return "query_list"
 
     # 第四优先级：路径关系类
-    if any(kw in question for kw in ["最短", "路径", "之间", "通过"]):
+    if any(kw in question for kw in ["最短", "路径", "之间", "通过", "什么关系", "是何关系", "什么交情"]):
+        return "query_path"
+
+    # 通用"X 和 Y" 关系查询（如"文彭和何震是什么关系"、"文彭与何震"）
+    if ("和" in question or "与" in question) and "关系" in question:
         return "query_path"
 
     # 第五优先级：观点类
@@ -285,9 +388,10 @@ def verify_result(state: QAState) -> QAState:
     rows = result.get("results", [])
     row_count = len(rows)
     if row_count == 0:
-        is_valid = True  # 执行成功，但图谱中无匹配数据
+        is_valid = False  # 图谱中无匹配数据 → 走 handle_error 友好提示
         warning = "查询执行成功，但图谱中未找到匹配数据"
-        # 注意：不修改 error_type，route_verify 会根据 row_count=0 路由到 handle_error
+        state["error_type"] = ErrorType.NO_RESULT
+        state["error_message"] = "知识图谱中无匹配数据"
     else:
         is_valid = True
         warning = ""
@@ -375,7 +479,12 @@ def _format_query_results(intent: str, rows: List[Dict]) -> str:
 
 
 def _format_attribute_results(rows: List[Dict]) -> str:
-    """格式化属性查询结果。"""
+    """格式化属性查询结果。
+
+    支持两种列名：
+    - 具体列名（styleName/hao/birthYear...）→ 用中文标签
+    - 通用列名（p/o）→ 把 ?p 行的值（属性名）映射到中文标签
+    """
     ATTR_LABELS = {
         "styleName": "字",
         "hao": "号",
@@ -387,14 +496,29 @@ def _format_attribute_results(rows: List[Dict]) -> str:
         "officialRank": "官职",
         "biography": "生平",
         "masterpiece": "代表作",
+        "appellation": "字号",
     }
     parts = []
     for row in rows:
-        for key, val in row.items():
-            key_clean = key.lstrip("?")
-            label = ATTR_LABELS.get(key_clean, key_clean)
-            if val:
-                parts.append(f"{label}：{val}")
+        # 模式 A：每行有具体属性列（如 ?styleName）—— 直接读 val
+        has_specific = any(
+            k.lstrip("?") in ATTR_LABELS
+            for k in row.keys()
+        )
+        if has_specific:
+            for key, val in row.items():
+                key_clean = key.lstrip("?")
+                label = ATTR_LABELS.get(key_clean, key_clean)
+                if val:
+                    parts.append(f"{label}：{val}")
+        else:
+            # 模式 B：通用 ?p/?o —— 把 p 值的 local-name 当作属性名
+            p_val = row.get("p") or row.get("?p")
+            o_val = row.get("o") or row.get("?o")
+            if p_val and o_val:
+                p_local = str(p_val).split("/")[-1]
+                label = ATTR_LABELS.get(p_local, p_local)
+                parts.append(f"{label}：{o_val}")
     return "；".join(parts) if parts else "未找到属性信息"
 
 
@@ -423,7 +547,7 @@ def _format_school_results(rows: List[Dict]) -> str:
     for row in rows:
         for key, val in row.items():
             key_clean = key.lstrip("?")
-            if val and key_clean in ("personName", "name"):
+            if val and key_clean in ("personName", "name", "schoolName"):
                 names.append(str(val))
     return f"包括：{'、'.join(names)}" if names else "未找到流派成员"
 
@@ -443,7 +567,7 @@ def _format_list_results(rows: List[Dict]) -> str:
 # 节点7：异常处理
 # ============================================================
 
-def handle_error(state: QAState, llm_client=None) -> QAState:
+def handle_error(state: QAState, llm_client=None, rag_retriever=None) -> QAState:
     """
     异常处理节点。
 
@@ -481,7 +605,7 @@ def handle_error(state: QAState, llm_client=None) -> QAState:
     # 构建 LLM 人设回答
     if llm_client:
         answer = _llm_fallback(question, person, error_type, error_msg, sparql_error,
-                               verification, llm_client)
+                               verification, llm_client, rag_retriever)
     else:
         answer = _rule_fallback(question, person, error_type, error_msg, sparql_error)
 
@@ -536,8 +660,26 @@ def _llm_fallback(question: str, person: str,
                   error_type: str, error_msg: str,
                   sparql_error: str,
                   verification,
-                  llm_client) -> str:
-    """LLM 人设兜底回答。"""
+                  llm_client,
+                  rag_retriever=None) -> str:
+    """LLM 人设兜底回答（可带 RAG 原文检索上下文）。"""
+    # 先用 RAG 检索原文
+    rag_context = ""
+    if rag_retriever is not None and person:
+        try:
+            # 用人物名 + 问题关键词检索原文
+            search_query = person + " " + question
+            chunks = rag_retriever.retrieve(search_query, top_k=3, threshold=0.25)
+            if chunks:
+                parts = []
+                for ch in chunks:
+                    src = f"（{ch.get('chapter', '')} {ch.get('title', '')}）"
+                    parts.append(f"{src}「{ch.get('content', '')[:300]}」")
+                rag_context = "\n\n【原文摘录】\n" + "\n".join(parts)
+                logger.info(f"RAG retrieved {len(chunks)} chunks for fallback")
+        except Exception as e:
+            logger.warning(f"RAG retrieve failed: {e}")
+
     # 构建上下文
     context_parts = [
         f"用户问题：{question}",
@@ -554,6 +696,9 @@ def _llm_fallback(question: str, person: str,
     if error_type in error_descriptions:
         context_parts.append(f"情况说明：{error_descriptions[error_type]}")
 
+    if rag_context:
+        context_parts.append(rag_context)
+
     context_parts.append(
         "重要原则：\n"
         "1. 如果图谱中没有确切信息，必须诚实告知用户，绝不凭空编造\n"
@@ -565,6 +710,34 @@ def _llm_fallback(question: str, person: str,
     system_prompt = SEAL_ENGRAVING_PERSONA
     user_prompt = "\n\n".join(context_parts)
 
+    # 优先用 OpenAI-compatible API（DeepSeek），fallback 到 Ollama
+    try:
+        import httpx
+        from ..utils.config import OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL
+
+        if OPENAI_API_KEY:
+            with httpx.Client(timeout=60.0) as client:
+                resp = client.post(
+                    f"{OPENAI_BASE_URL.rstrip('/')}/chat/completions",
+                    json={
+                        "model": OPENAI_MODEL,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        "max_tokens": 512,
+                        "temperature": 0.3,
+                    },
+                    headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
+                )
+                if resp.status_code == 200:
+                    answer = resp.json()["choices"][0]["message"]["content"].strip()
+                    if answer:
+                        return answer
+    except Exception as e:
+        logger.warning(f"OpenAI-compatible fallback failed: {e}")
+
+    # Ollama fallback
     try:
         import httpx
         from ..utils.config import OLLAMA_BASE_URL, OLLAMA_MODEL
@@ -585,6 +758,6 @@ def _llm_fallback(question: str, person: str,
                 if answer:
                     return answer
     except Exception as e:
-        logger.error(f"LLM fallback failed: {e}")
+        logger.warning(f"Ollama fallback failed: {e}")
 
     return _rule_fallback(question, person, error_type, error_msg, sparql_error)

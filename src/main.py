@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import logging
-import json
 import os
 import sys
 from pathlib import Path
@@ -30,8 +29,16 @@ app.add_middleware(
 
 _graph_data: Dict[str, Any] = {}
 _rdf_store = None
+_rag_retriever = None  # RAG retriever, lazily loaded
 
 _api_base = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000")
+
+# 视图类查询缓存（首次访问时计算一次；TTL 重载后清空）
+_view_cache: Dict[str, Any] = {}
+
+
+def _clear_view_cache():
+    _view_cache.clear()
 
 
 class QARequest(BaseModel):
@@ -47,7 +54,7 @@ def _get_project_root() -> Path:
 
 
 def _ensure_loaded():
-    global _graph_data, _rdf_store
+    global _rdf_store
     if _rdf_store is not None:
         return
 
@@ -59,35 +66,41 @@ def _ensure_loaded():
         from backend.rdf.rdf_store import RDFStore
 
         rdf_path = data_output / "linked_graph.ttl"
+        if not rdf_path.exists():
+            rdf_path = data_output / "knowledge_graph.ttl"
         if rdf_path.exists():
             _rdf_store = RDFStore().load(rdf_path)
             logger.info(f"RDF store loaded from {rdf_path}")
         else:
-            rdf_path = data_output / "knowledge_graph.ttl"
-            if rdf_path.exists():
-                _rdf_store = RDFStore().load(rdf_path)
-                logger.info(f"RDF store loaded from {rdf_path} (linked_graph not found)")
-            else:
-                _rdf_store = RDFStore()
-                logger.info("RDF store initialized (no file yet)")
-
-        persons_path = data_output / "persons.json"
-        if persons_path.exists():
-            with open(persons_path, "r", encoding="utf-8") as f:
-                _graph_data["persons"] = json.load(f)
-
-        rels_path = data_output / "relations.json"
-        if rels_path.exists():
-            with open(rels_path, "r", encoding="utf-8") as f:
-                _graph_data["relations"] = json.load(f)
-
-        graph_path = data_output / "graph.json"
-        if graph_path.exists():
-            with open(graph_path, "r", encoding="utf-8") as f:
-                _graph_data["graph"] = json.load(f)
+            _rdf_store = RDFStore()
+            logger.info("RDF store initialized (no file yet)")
 
     except Exception as e:
-        logger.warning(f"Failed to preload data: {e}")
+        logger.error(f"Failed to load data: {e}")
+        _rdf_store = None
+
+
+def _load_rag_retriever():
+    """Lazily load RAG retriever from saved FAISS index."""
+    global _rag_retriever
+    if _rag_retriever is not None:
+        return
+
+    try:
+        from backend.utils.config import FAISS_INDEX, FAISS_META
+        if not FAISS_INDEX.exists() or not FAISS_META.exists():
+            logger.info("RAG index files not found; RAG disabled")
+            return
+
+        from backend.qa.rag.retriever import RAGRetriever
+        retriever = RAGRetriever()
+        if retriever.load(FAISS_INDEX, FAISS_META):
+            _rag_retriever = retriever
+            logger.info(f"RAG retriever loaded from {FAISS_INDEX}")
+        else:
+            logger.warning("RAG retriever failed to load")
+    except Exception as e:
+        logger.warning(f"RAG retriever load failed: {e}")
 
 
 @app.get("/api/info")
@@ -100,9 +113,16 @@ def health():
     return {"status": "ok"}
 
 
+from fastapi.responses import Response
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(content=b"", media_type="image/x-icon", status_code=204)
+
+
 @app.post("/api/qa")
 def qa(req: QARequest):
     _ensure_loaded()
+    _load_rag_retriever()
     if _rdf_store is None:
         raise HTTPException(status_code=503, detail="知识图谱未加载，请先运行抽取流程")
 
@@ -111,7 +131,7 @@ def qa(req: QARequest):
         from backend.qa.tools import QATools
 
         tools = QATools(_rdf_store)
-        workflow = build_qa_workflow(_rdf_store)
+        workflow = build_qa_workflow(_rdf_store, _rag_retriever)
 
         if hasattr(workflow, "invoke"):
             result = workflow.invoke({"question": req.question})
@@ -173,26 +193,28 @@ def get_relations(name: str, types: Optional[str] = None):
 @app.get("/api/graph")
 def get_graph():
     _ensure_loaded()
-    g = _graph_data.get("graph")
-    if not g:
+    if _rdf_store is None:
         return {"nodes": [], "links": []}
-    return g
+    if "graph" not in _view_cache:
+        _view_cache["graph"] = _rdf_store.get_graph_view()
+    return _view_cache["graph"]
 
 
 @app.get("/api/persons")
 def get_persons():
     _ensure_loaded()
-    persons = _graph_data.get("persons", [])
-    if not persons and _rdf_store:
-        persons = _rdf_store.get_all_persons()
+    if _rdf_store is None:
+        return {"persons": [], "count": 0}
+    persons = _rdf_store.get_all_persons()
     return {"persons": persons, "count": len(persons)}
 
 
 @app.get("/api/schools")
 def get_schools():
     _ensure_loaded()
-    g = _graph_data.get("graph", {})
-    schools = [n for n in g.get("nodes", []) if n.get("type") == "school"]
+    if _rdf_store is None:
+        return {"schools": [], "count": 0}
+    schools = _rdf_store.get_all_schools()
     return {"schools": schools, "count": len(schools)}
 
 
@@ -209,26 +231,57 @@ def get_school(name: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _compute_centrality() -> Dict[str, Any]:
+    from backend.graph_analysis.centrality import CentralityAnalysis
+    if _rdf_store is None:
+        return {"error": "知识图谱未加载"}
+    G = _rdf_store.to_networkx()
+    ca = CentralityAnalysis(G)
+    return {
+        "degree_centrality": ca.degree_centrality(),
+        "betweenness_centrality": ca.betweenness_centrality(),
+        "pagerank": ca.pagerank(),
+        "closeness_centrality": ca.closeness_centrality(),
+    }
+
+
+def _compute_communities() -> Dict[str, Any]:
+    from backend.graph_analysis.community import CommunityDetection
+    if _rdf_store is None:
+        return {"error": "知识图谱未加载"}
+    G = _rdf_store.to_networkx()
+    cd = CommunityDetection(G)
+    cd.louvain()
+    return cd.communities
+
+
 @app.get("/api/analysis/centrality")
 def get_centrality():
     _ensure_loaded()
-    project_root = _get_project_root()
-    path = project_root / "data" / "output" / "centrality.json"
-    if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"error": "analysis not available yet"}
+    if "centrality" not in _view_cache:
+        _view_cache["centrality"] = _compute_centrality()
+    return _view_cache["centrality"]
 
 
 @app.get("/api/analysis/communities")
 def get_communities():
     _ensure_loaded()
-    project_root = _get_project_root()
-    path = project_root / "data" / "output" / "communities.json"
-    if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"error": "communities not available yet"}
+    if "communities" not in _view_cache:
+        _view_cache["communities"] = _compute_communities()
+    return _view_cache["communities"]
+
+
+@app.post("/api/reload")
+def reload_data():
+    """清除缓存并重新加载 TTL + RAG（开发用）。"""
+    global _rdf_store, _rag_retriever
+    _rdf_store = None
+    _rag_retriever = None
+    _clear_view_cache()
+    _ensure_loaded()
+    _load_rag_retriever()
+    triples = len(_rdf_store.graph) if _rdf_store else 0
+    return {"reloaded": True, "triples": triples, "rag_loaded": _rag_retriever is not None}
 
 
 def _mount_frontend():
@@ -251,6 +304,11 @@ def _mount_frontend():
         if data_dir.exists():
             app.mount("/data", StaticFiles(directory=str(data_dir)), name="data")
             logger.info(f"Mounted data/ at /data/")
+
+        static_dir = project_root / "static"
+        if static_dir.exists():
+            app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+            logger.info(f"Mounted static/ at /static/")
     else:
         logger.warning(f"index.html not found at {index_path}, frontend not mounted")
 

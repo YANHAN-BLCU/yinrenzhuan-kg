@@ -1,22 +1,25 @@
 import logging
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from .embedding import EmbeddingModel
 from .vector_index import VectorIndex
+from ...utils.config import EMBEDDING_DIM
 
 logger = logging.getLogger(__name__)
 
 
 class RAGRetriever:
 
-    def __init__(self, entries: List[Dict[str, Any]]):
-        self.entries = entries
+    def __init__(self, entries: List[Dict[str, Any]] = None):
+        self.entries: List[Dict[str, Any]] = entries or []
         self.embedding_model: Optional[EmbeddingModel] = None
         self.vector_index: Optional[VectorIndex] = None
         self._initialized = False
 
-    def initialize(self, model_name: str = "BAAI/bge-base-zh-v1.5"):
+    def initialize(self):
+        from ...utils.config import EMBEDDING_MODEL
         try:
-            self.embedding_model = EmbeddingModel(model_name)
+            self.embedding_model = EmbeddingModel(EMBEDDING_MODEL)
             self.embedding_model.load()
             if self.embedding_model.model is None:
                 logger.warning("Embedding model not loaded, RAG disabled")
@@ -44,6 +47,46 @@ class RAGRetriever:
         except Exception as e:
             logger.error(f"Failed to initialize RAG retriever: {e}")
             self._initialized = False
+
+    def save(self, index_path: Path, meta_path: Path):
+        from ...utils.config import EMBEDDING_MODEL
+        """持久化索引（FAISS + metadata JSON）。"""
+        if not self._initialized or self.vector_index is None:
+            raise RuntimeError("RAG retriever not initialized; call initialize() first")
+        index_path.parent.mkdir(parents=True, exist_ok=True)
+        meta_path.parent.mkdir(parents=True, exist_ok=True)
+        self.vector_index.save(index_path, meta_path)
+        Path(meta_path).with_suffix(".model.txt").write_text(
+            EMBEDDING_MODEL, encoding="utf-8"
+        )
+        logger.info(f"RAG index saved: {index_path}, {meta_path}")
+
+    def load(self, index_path: Path, meta_path: Path):
+        from ...utils.config import EMBEDDING_MODEL
+        if not index_path.exists() or not meta_path.exists():
+            logger.warning(f"RAG index files missing: {index_path.exists()=} {meta_path.exists()=}")
+            self._initialized = False
+            return False
+        try:
+            self.embedding_model = EmbeddingModel(EMBEDDING_MODEL)
+            self.embedding_model.load()
+            if self.embedding_model.model is None:
+                logger.warning("Embedding model not loaded; RAG disabled")
+                return False
+
+            self.vector_index = VectorIndex(dimension=self.embedding_model.dim)
+            self.vector_index.load(index_path, meta_path)
+            if not self.vector_index._built:
+                logger.warning("FAISS index failed to load")
+                return False
+
+            self._initialized = True
+            logger.info(f"RAG retriever loaded: {self.vector_index.index.ntotal} vectors")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to load RAG retriever: {e}")
+            self._initialized = False
+            return False
 
     def retrieve(self, query: str, top_k: int = 5, threshold: float = 0.3) -> List[Dict[str, Any]]:
         if not self._initialized or self.vector_index is None:
