@@ -30,12 +30,12 @@ Thumbs.db
 dist/
 build/
 
-# Large generated artifacts (rebuild locally)
+# Large generated artifacts (rebuild locally via run_pipeline.py)
+# — 文本语料 (.txt) 已提交，方便一键构建 RAG
+# — FAISS 索引 + 元数据本地生成，不提交
 data/output/yinrenchuan_faiss.index
 data/output/yinrenchuan_faiss.meta.json
 data/output/yinrenchuan_faiss.meta.model.txt
-data/raw/
-data/dictionaries/
 
 # Test / cache
 .pytest_cache/

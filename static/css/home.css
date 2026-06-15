@@ -1,0 +1,331 @@
+/* ===================== Hero 区域 ===================== */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 120px 24px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-bg-pattern .seal-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  opacity: 0.04;
+}
+
+.hero-bg-pattern .grid-seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "STKaiti", serif;
+  font-size: 14px;
+  color: var(--cinnabar);
+  border: 1px solid rgba(193, 57, 45, 0.15);
+  padding: 6px;
+  width: 52px;
+  height: 52px;
+}
+
+.hero-title {
+  font-family: "STKaiti", "KaiTi", "楷体", serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 500;
+  color: var(--ink-black);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  opacity: 0;
+  animation: fadeSlideDown 0.8s ease forwards 0.1s;
+}
+
+.hero-title-seal {
+  color: var(--cinnabar);
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title-main {
+  color: var(--text-primary);
+  font-size: 0.68em;
+  font-weight: 400;
+  display: block;
+  margin-top: 4px;
+  letter-spacing: 0.08em;
+}
+
+.hero-subtitle {
+  font-family: "Noto Serif SC", serif;
+  font-size: clamp(14px, 1.8vw, 16px);
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.7;
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeSlideDown 0.8s ease forwards 0.3s;
+}
+
+/* ===================== 印章鉴赏区 ===================== */
+.cards-showcase {
+  padding: 12px 24px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cards-showcase-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cards-showcase .section-header {
+  margin-bottom: 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.showcase-card {
+  position: relative;
+  height: 220px;
+  perspective: 1000px;
+  cursor: pointer;
+  border-radius: 8px;
+  animation-fill-mode: forwards;
+}
+
+.showcase-card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.showcase-card.flipped .showcase-card-inner {
+  transform: rotateY(180deg);
+}
+
+.showcase-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.showcase-card-front {
+  background: var(--paper-white);
+  border: 1.5px solid rgba(193, 57, 45, 0.15);
+  box-shadow: 0 2px 12px rgba(26, 26, 26, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.showcase-card:hover .showcase-card-front {
+  box-shadow: 0 6px 24px rgba(26, 26, 26, 0.14), 0 0 0 2px rgba(193, 57, 45, 0.2);
+  transform: scale(1.03);
+  border-color: rgba(193, 57, 45, 0.3);
+}
+
+.front-seal-wrap {
+  width: 100px;
+  height: 100px;
+  border: 2.5px solid var(--cinnabar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--jade-white);
+  position: relative;
+}
+
+.front-seal-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(193, 57, 45, 0.15);
+}
+
+.front-seal-char {
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 2.8rem;
+  font-weight: 600;
+  color: var(--cinnabar);
+  line-height: 1;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.06);
+}
+
+.front-seal-img {
+  width: 130%;
+  height: 130%;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.front-number {
+  font-family: "STKaiti", "KaiTi", "楷体", serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+.showcase-card-back {
+  background: #f9e9c8;
+  border: 1.5px solid rgba(193, 57, 45, 0.25);
+  transform: rotateY(180deg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.showcase-card-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.06) 0%, transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(200,169,110,0.015) 3px,
+      rgba(200,169,110,0.015) 6px
+    );
+  pointer-events: none;
+}
+
+.back-top-bar {
+  background: linear-gradient(135deg, rgba(90,53,0,0.08) 0%, rgba(90,53,0,0.03) 100%);
+  border-bottom: 1px solid rgba(90,53,0,0.15);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-title {
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #5a3500;
+  letter-spacing: 0.15em;
+}
+
+.back-body {
+  flex: 1;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.back-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(90,53,0,0.1);
+}
+
+.back-meta .meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.back-meta .meta-label {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 0.55rem;
+  color: rgba(90, 53, 0, 0.5);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.back-meta .meta-value {
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.75rem;
+  color: #3d1a00;
+  opacity: 0.85;
+}
+
+.back-desc {
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.72rem;
+  color: #3d1a00;
+  line-height: 1.7;
+  opacity: 0.8;
+  flex: 1;
+}
+
+.back-footer {
+  padding: 5px 14px;
+  border-top: 1px solid rgba(200,169,110,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flip-hint {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 0.55rem;
+  color: rgba(90, 53, 0, 0.35);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@keyframes floatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes floatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes floatC { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+.showcase-card.float-a { animation: floatA 4.5s ease-in-out infinite; }
+.showcase-card.float-b { animation: floatB 5.2s ease-in-out infinite; }
+.showcase-card.float-c { animation: floatC 3.8s ease-in-out infinite; }
+
+.showcase-card.flipped {
+  animation-play-state: paused !important;
+}
+
+.cards-cta {
+  text-align: center;
+  opacity: 1;
+}
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 14px;
+  color: var(--cinnabar);
+  text-decoration: none;
+  padding: 10px 24px;
+  border: 1.5px solid rgba(193, 57, 45, 0.3);
+  border-radius: 24px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.cta-link:hover {
+  background: rgba(193, 57, 45, 0.06);
+  border-color: var(--cinnabar);
+  gap: 12px;
+}

@@ -1,0 +1,625 @@
+/* ===================== 图谱节点详情面板 ===================== */
+.node-detail-panel {
+  position: fixed;
+  top: 80px;
+  right: -420px;
+  width: 380px;
+  max-height: calc(100vh - 120px);
+  background: var(--jade-white);
+  border-left: 1px solid var(--border-light);
+  box-shadow: -4px 0 24px rgba(26, 26, 26, 0.08);
+  z-index: 200;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  border-radius: 12px 0 0 12px;
+}
+
+.node-detail-panel.open {
+  right: 0;
+}
+
+.node-detail-header {
+  padding: 20px 20px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.node-detail-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.node-detail-badge.person {
+  background: var(--cinnabar-light);
+  color: var(--cinnabar-dark);
+}
+
+.node-detail-badge.school {
+  background: rgba(74, 122, 107, 0.1);
+  color: var(--stone-green);
+}
+
+.node-detail-name {
+  font-family: "STKaiti", "KaiTi", "楷体", serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink-black);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.node-detail-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.node-detail-close:hover {
+  background: var(--cinnabar-light);
+  color: var(--cinnabar-dark);
+  border-color: var(--border-accent);
+}
+
+.node-detail-body {
+  padding: 16px 20px 20px;
+}
+
+.node-detail-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 14px 0;
+}
+
+.node-detail-section {
+  margin-bottom: 16px;
+}
+
+.node-detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.node-detail-section-title {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+
+.node-detail-attr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.node-detail-attr-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.node-detail-attr-label {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.node-detail-attr-value {
+  font-family: "Noto Serif SC", serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.node-detail-attr-full {
+  font-family: "Noto Serif SC", serif;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.node-detail-rel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.node-detail-rel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--paper-white);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.node-detail-rel-item:hover {
+  background: var(--cinnabar-light);
+  border-color: var(--border-accent);
+}
+
+.node-detail-rel-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.rel-badge-teacher { background: rgba(193, 57, 45, 0.12); color: #C1392D; }
+.rel-badge-student { background: rgba(193, 57, 45, 0.12); color: #C1392D; }
+.rel-badge-school { background: rgba(74, 122, 107, 0.12); color: #4A7A6B; }
+.rel-badge-friend { background: rgba(198, 123, 48, 0.12); color: #C67B30; }
+.rel-badge-other { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
+
+.node-detail-rel-target {
+  font-family: "Noto Serif SC", serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.node-detail-school-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.node-detail-member-tag {
+  padding: 5px 12px;
+  background: var(--paper-white);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  font-family: "Noto Serif SC", serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.node-detail-member-tag:hover {
+  background: var(--cinnabar-light);
+  border-color: var(--border-accent);
+  color: var(--cinnabar-dark);
+}
+
+.node-detail-empty {
+  text-align: center;
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+}
+
+.node-detail-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  gap: 12px;
+  color: var(--text-muted);
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+}
+
+/* ===================== 图谱区域 ===================== */
+.graph-section {
+  padding: 80px 24px;
+  background: var(--paper-white);
+  min-height: 700px;
+}
+
+.graph-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.graph-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.graph-filter {
+  padding: 6px 16px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  border-radius: 20px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.graph-filter:hover, .graph-filter.active {
+  background: var(--cinnabar);
+  color: white;
+  border-color: var(--cinnabar);
+}
+
+.graph-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.person { background: var(--cinnabar); }
+.legend-dot.school { background: var(--stone-green); }
+
+.legend-line {
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+/* ===================== 图谱搜索栏 ===================== */
+.graph-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.graph-search-input {
+  padding: 5px 12px 5px 32px;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  background: white;
+  color: var(--text-primary);
+  width: 160px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.graph-search-input:focus {
+  border-color: var(--cinnabar);
+  width: 200px;
+}
+
+.graph-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 13px;
+}
+
+.graph-search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 200px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card-hover);
+  z-index: 100;
+}
+
+.graph-search-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: background 0.15s;
+}
+
+.graph-search-item:hover {
+  background: var(--cinnabar-light);
+}
+
+.graph-search-item .search-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+/* ===================== 图谱路径搜索 ===================== */
+.graph-path-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 12px;
+}
+
+.graph-path-input {
+  padding: 5px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  font-size: 12px;
+  background: white;
+  color: var(--text-primary);
+  width: 90px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.graph-path-input:focus {
+  border-color: var(--cinnabar);
+}
+
+.graph-path-search .path-sep {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.graph-btn-path {
+  padding: 5px 12px;
+  background: var(--stone-green);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Noto Sans SC", sans-serif;
+}
+
+.graph-btn-path:hover {
+  background: #3a6355;
+}
+
+.graph-btn-clear {
+  padding: 5px 10px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Noto Sans SC", sans-serif;
+}
+
+.graph-btn-clear:hover {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+}
+
+/* ===================== 时代过滤 ===================== */
+.graph-dynasty-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.dynasty-slider {
+  -webkit-appearance: none;
+  width: 100px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-light);
+  outline: none;
+}
+
+.dynasty-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--cinnabar);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.dynasty-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.dynasty-label {
+  min-width: 30px;
+  text-align: center;
+  color: var(--cinnabar);
+  font-weight: 500;
+}
+
+/* ===================== 悬停邻居高亮 ===================== */
+.node circle {
+  transition: filter 0.2s, r 0.2s;
+}
+
+.node circle.dimmed {
+  filter: opacity(0.2) saturate(0.3);
+}
+
+.node circle.highlighted {
+  filter: drop-shadow(0 0 6px rgba(193, 57, 45, 0.8));
+}
+
+.node text.dimmed {
+  opacity: 0.15;
+}
+
+.link.dimmed {
+  opacity: 0.1;
+}
+
+.link.highlighted-path {
+  stroke: #D4AF37 !important;
+  stroke-width: 3px !important;
+  opacity: 1 !important;
+}
+
+.node.highlighted-path circle {
+  stroke: #D4AF37 !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.9));
+}
+
+.node.highlighted-path text {
+  fill: #D4AF37 !important;
+  font-weight: 600;
+}
+
+.graph-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--jade-white);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  position: relative;
+  height: 560px;
+  overflow: hidden;
+}
+
+#graphSvg {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+#graphSvg:active { cursor: grabbing; }
+
+.graph-loading, .graph-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-muted);
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--cinnabar);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.graph-error button {
+  padding: 6px 16px;
+  background: var(--cinnabar);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+}
+
+.graph-controls {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.graph-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--jade-white);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  box-shadow: var(--shadow-card);
+}
+
+.graph-btn:hover {
+  background: var(--cinnabar-light);
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+}
+
+.graph-info {
+  max-width: 1100px;
+  margin: 16px auto 0;
+  text-align: center;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.graph-info-sep { margin: 0 8px; }
+
+/* D3 图谱节点和连线样式 */
+.node circle {
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.node circle:hover { filter: brightness(1.15); }
+
+.node text {
+  font-family: "Noto Serif SC", serif;
+  font-size: 12px;
+  pointer-events: none;
+  fill: var(--text-primary);
+  paint-order: stroke;
+  stroke: var(--paper-white);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.link {
+  stroke-opacity: 0.6;
+}
